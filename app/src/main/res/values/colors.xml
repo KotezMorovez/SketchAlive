@@ -2,4 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="button_inactive">#FFFFFFFF</color>
+    <color name="button_active">#FFA8DB10</color>
+
+    <color name="gray">#FF8B8B8B</color>
+    <color name="dark_gray">#292A30</color>
+    <color name="green">#FFA8DB10</color>
+    <color name="blue">#FF1976D2</color>
+    <color name="orange">#FFFF3D00</color>
 </resources>

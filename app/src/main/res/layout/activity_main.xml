@@ -5,168 +5,178 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@color/black">
+    android:background="@color/dark_gray"
+    tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/buttonBack"
+        android:id="@+id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_arrow_back"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonDelete"
-        app:layout_constraintEnd_toStartOf="@+id/buttonForward"
+        app:layout_constraintBottom_toBottomOf="@+id/delete"
+        app:layout_constraintEnd_toStartOf="@+id/forward"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/buttonForward"
+        android:id="@+id/forward"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="16dp"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_arrow_forward"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonDelete"
-        app:layout_constraintEnd_toStartOf="@+id/buttonDelete"
+        app:layout_constraintBottom_toBottomOf="@+id/delete"
+        app:layout_constraintEnd_toStartOf="@+id/delete"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/buttonBack"
+        app:layout_constraintStart_toEndOf="@+id/back"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/buttonDelete"
+        android:id="@+id/delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_delete"
-        app:layout_constraintEnd_toStartOf="@+id/buttonCopy"
+        app:layout_constraintEnd_toStartOf="@+id/create"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/buttonForward"
+        app:layout_constraintStart_toEndOf="@+id/forward"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/buttonCopy"
+        android:id="@+id/create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_create"
-        app:layout_constraintEnd_toStartOf="@+id/buttonLayers"
+        app:layout_constraintEnd_toStartOf="@+id/layers"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/buttonDelete"
+        app:layout_constraintStart_toEndOf="@+id/delete"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/buttonLayers"
+        android:id="@+id/layers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="24dp"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_layers"
-        app:layout_constraintEnd_toStartOf="@+id/buttonPause"
+        app:layout_constraintEnd_toStartOf="@+id/pause"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/buttonCopy"
+        app:layout_constraintStart_toEndOf="@+id/create"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/buttonPause"
+        android:id="@+id/pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_stop"
-        app:layout_constraintEnd_toStartOf="@id/buttonPlay"
+        app:layout_constraintEnd_toStartOf="@id/play"
         app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toEndOf="@+id/buttonLayers"
+        app:layout_constraintStart_toEndOf="@+id/layers"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/buttonPlay"
+        android:id="@+id/play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toEndOf="@+id/buttonPause"
+        app:layout_constraintStart_toEndOf="@+id/pause"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/canvas"
+    <com.example.animatorforandroid.CanvasView
+        android:id="@+id/canvasView"
         android:layout_width="match_parent"
-        android:layout_height="560dp"
+        android:layout_height="0dp"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="32dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/canvas"
+        app:layout_constraintBottom_toTopOf="@+id/erase"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonCopy" />
+        app:layout_constraintTop_toBottomOf="@id/create" />
 
     <ImageView
         android:id="@+id/pencil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="32dp"
+        android:clickable="true"
         android:src="@drawable/ic_pencil"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/brush"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/canvas" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/brush"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="32dp"
         android:src="@drawable/ic_brush"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/erase"
-        app:layout_constraintStart_toEndOf="@id/pencil"
-        app:layout_constraintTop_toBottomOf="@+id/canvas" />
+        app:layout_constraintStart_toEndOf="@id/pencil" />
 
     <ImageView
         android:id="@+id/erase"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="32dp"
         android:src="@drawable/ic_erase"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/instruments"
-        app:layout_constraintStart_toEndOf="@id/brush"
-        app:layout_constraintTop_toBottomOf="@+id/canvas" />
+        app:layout_constraintStart_toEndOf="@id/brush" />
 
     <ImageView
         android:id="@+id/instruments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="32dp"
         android:src="@drawable/ic_instruments"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/color"
-        app:layout_constraintStart_toEndOf="@id/erase"
-        app:layout_constraintTop_toBottomOf="@+id/canvas" />
+        app:layout_constraintStart_toEndOf="@id/erase" />
 
     <ImageView
         android:id="@+id/color"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/ic_color"
+        android:background="@drawable/ic_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/instruments"
-        app:layout_constraintTop_toBottomOf="@+id/canvas" />
+        app:layout_constraintTop_toTopOf="@+id/instruments"
+        tools:src="@drawable/color_active" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
