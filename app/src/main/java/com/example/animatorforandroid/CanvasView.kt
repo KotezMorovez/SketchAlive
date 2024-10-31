@@ -1,5 +1,7 @@
 package com.example.animatorforandroid
 
+import android.animation.ValueAnimator
+import android.animation.ValueAnimator.INFINITE
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -7,10 +9,12 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PathMeasure
 import android.util.AttributeSet
-import android.util.EventLog
 import android.view.MotionEvent
 import android.view.View
-import androidx.resourceinspection.annotation.Attribute.IntMap
+import android.view.animation.LinearInterpolator
+import androidx.core.animation.addListener
+import org.w3c.dom.Node
+import java.util.LinkedList
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -21,8 +25,10 @@ class CanvasView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
     private var path = Path()
-    private var canvasObjectList = ArrayList<CanvasObject>()
     private val eventList = ArrayList<Event>()
+    private val frameList = arrayListOf(Frame(arrayListOf()))
+    private var frameIndex = 0
+    private var animationFrameIndex = 0
     private var instrumentColor = Color.BLUE
     private val instrumentStyle: Paint.Style = Paint.Style.STROKE
     private var instrument = Instrument.NONE
@@ -31,34 +37,42 @@ class CanvasView @JvmOverloads constructor(
     private var mY = 0f
     private var startCoordX = 0f
     private var startCoordY = 0f
+    private var isForAnimation = false
     private var paint = Paint().apply {
         isAntiAlias = true
         isDither = true
         style = instrumentStyle
         alpha = 255
     }
+    private val valueAnimator = ValueAnimator().apply {
+        repeatCount = INFINITE
+        duration = 5_000L
+        interpolator = LinearInterpolator()
+        addUpdateListener {
+            if (it.animatedValue != frameList.size) {
+                animationFrameIndex = it.animatedValue as Int
+                invalidate()
+            }
+        }
+        addListener(onEnd = {
+            isForAnimation = false
+            it.cancel()
+            invalidate()
+        })
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        for (canvasObject in canvasObjectList) {
-            if (canvasObject.isDelete) {
-                continue
+        if (!isForAnimation) {
+            if (frameList.size > 1) {
+                drawFrame(frameList[frameIndex - 1].canvasObjectList, canvas, true)
             }
-
-            if (canvasObject.instrument == Instrument.PENCIL) {
-                paint.strokeWidth = 4f
-                paint.strokeJoin = Paint.Join.BEVEL
-                paint.strokeCap = Paint.Cap.SQUARE
-            } else {
-                paint.strokeWidth = 16f
-                paint.strokeJoin = Paint.Join.ROUND
-                paint.strokeCap = Paint.Cap.ROUND
-            }
-
-            paint.color = canvasObject.color
-            canvas.drawPath(canvasObject.path, paint)
+            drawFrame(frameList[frameIndex].canvasObjectList, canvas, false)
+        } else {
+            drawFrame(frameList[animationFrameIndex].canvasObjectList, canvas, false)
         }
+
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -99,20 +113,30 @@ class CanvasView @JvmOverloads constructor(
     }
 
     fun clear() {
-        canvasObjectList.clear()
+        frameList[frameIndex].canvasObjectList.clear()
         eventList.clear()
         eventIndex = -1
         invalidate()
     }
 
     fun create() {
-        // TODO Создание нового кадра
+        val frame = Frame(
+            arrayListOf()
+        )
+        frameIndex++
+        if (frameIndex > frameList.size - 1) {
+            frameList.add(frame)
+        } else {
+            frameList.add(frameIndex, frame)
+        }
+        clear()
     }
 
     fun undo() {
         if (eventIndex >= 0) {
             val event = eventList[eventIndex]
-            canvasObjectList[event.index].isDelete = !canvasObjectList[event.index].isDelete
+            frameList[frameIndex].canvasObjectList[event.index].isDelete =
+                !frameList[frameIndex].canvasObjectList[event.index].isDelete
             eventIndex--
             invalidate()
         }
@@ -122,9 +146,26 @@ class CanvasView @JvmOverloads constructor(
         if (eventIndex < eventList.size - 1) {
             eventIndex++
             val event = eventList[eventIndex]
-            canvasObjectList[event.index].isDelete = !canvasObjectList[event.index].isDelete
+            frameList[frameIndex].canvasObjectList[event.index].isDelete =
+                !frameList[frameIndex].canvasObjectList[event.index].isDelete
             invalidate()
         }
+    }
+
+    fun play() {
+        isForAnimation = true
+        animationFrameIndex = -1
+
+        valueAnimator.duration = FRAME_DELAY * frameList.size
+
+        valueAnimator.setIntValues(0, frameList.size)
+
+        valueAnimator.start()
+
+    }
+
+    fun pause() {
+        valueAnimator.cancel()
     }
 
     private fun touchStart(x: Float, y: Float) {
@@ -137,7 +178,7 @@ class CanvasView @JvmOverloads constructor(
                 isDelete = false
             )
 
-            canvasObjectList.add(canvasObject)
+            frameList[frameIndex].canvasObjectList.add(canvasObject)
 
             if (eventIndex != eventList.size - 1) {
                 while (eventIndex != eventList.size - 1) {
@@ -145,7 +186,7 @@ class CanvasView @JvmOverloads constructor(
                 }
             }
 
-            eventList.add(Event.DrawObject(index = canvasObjectList.size - 1))
+            eventList.add(Event.DrawObject(index = frameList[frameIndex].canvasObjectList.size - 1))
             eventIndex++
 
         }
@@ -179,12 +220,12 @@ class CanvasView @JvmOverloads constructor(
             }
 
             Instrument.ERASE -> {
-                for (i in canvasObjectList.indices) {
+                for (i in frameList[frameIndex].canvasObjectList.indices) {
                     if (
-                        !canvasObjectList[i].isDelete &&
-                        isPointOnPath(canvasObjectList[i].path, x, y)
+                        !frameList[frameIndex].canvasObjectList[i].isDelete &&
+                        isPointOnPath(frameList[frameIndex].canvasObjectList[i].path, x, y)
                     ) {
-                        canvasObjectList[i].isDelete = true
+                        frameList[frameIndex].canvasObjectList[i].isDelete = true
 
                         if (eventIndex != eventList.size - 1) {
                             while (eventIndex != eventList.size - 1) {
@@ -301,12 +342,12 @@ class CanvasView @JvmOverloads constructor(
             }
 
             Instrument.ERASE -> {
-                for (i in canvasObjectList.indices) {
+                for (i in frameList[frameIndex].canvasObjectList.indices) {
                     if (
-                        !canvasObjectList[i].isDelete &&
-                        isPointOnPath(canvasObjectList[i].path, x, y)
+                        !frameList[frameIndex].canvasObjectList[i].isDelete &&
+                        isPointOnPath(frameList[frameIndex].canvasObjectList[i].path, x, y)
                     ) {
-                        canvasObjectList[i].isDelete = true
+                        frameList[frameIndex].canvasObjectList[i].isDelete = true
 
                         if (eventIndex != eventList.size - 1) {
                             while (eventIndex != eventList.size - 1) {
@@ -458,6 +499,33 @@ class CanvasView @JvmOverloads constructor(
         return false
     }
 
+    private fun drawFrame(list: List<CanvasObject>, canvas: Canvas, isTranslucent: Boolean) {
+        for (canvasObject in list) {
+            if (canvasObject.isDelete) {
+                continue
+            }
+
+            if (canvasObject.instrument == Instrument.PENCIL) {
+                paint.strokeWidth = 4f
+                paint.strokeJoin = Paint.Join.BEVEL
+                paint.strokeCap = Paint.Cap.SQUARE
+            } else {
+                paint.strokeWidth = 16f
+                paint.strokeJoin = Paint.Join.ROUND
+                paint.strokeCap = Paint.Cap.ROUND
+            }
+
+            if (isTranslucent) {
+                val translucentColor = canvasObject.color and 0x00ffffff or (70 shl 24)
+                paint.color = translucentColor
+            } else {
+                paint.color = canvasObject.color
+            }
+
+            canvas.drawPath(canvasObject.path, paint)
+        }
+    }
+
     enum class Instrument {
         NONE,
         PENCIL,
@@ -481,7 +549,12 @@ class CanvasView @JvmOverloads constructor(
         var isDelete: Boolean
     )
 
+    data class Frame(
+        val canvasObjectList: ArrayList<CanvasObject>
+    )
+
     companion object {
         private const val TOUCH_TOLERANCE = 4f
+        private const val FRAME_DELAY = 300L
     }
 }

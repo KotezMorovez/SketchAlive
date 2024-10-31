@@ -11,6 +11,8 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import com.example.animatorforandroid.databinding.ActivityMainBinding
 import com.example.animatorforandroid.databinding.FragmentInstrumentsBinding
 import com.example.animatorforandroid.databinding.FragmentPaletteBinding
@@ -51,8 +53,58 @@ class MainActivity : AppCompatActivity() {
             }
             canvasView.clipToOutline = true
 
-            pause.setOnClickListener { AnimatorHandler.pause() }
-            play.setOnClickListener { AnimatorHandler.play() }
+            pause.setOnClickListener {
+                back.isVisible = true
+                forward.isVisible = true
+                delete.isVisible = true
+                create.isVisible = true
+                layers.isVisible = true
+                pencil.isVisible = true
+                brush.isVisible = true
+                erase.isVisible = true
+                instruments.isVisible = true
+                color.isVisible = true
+
+                back.isClickable = true
+                forward.isClickable = true
+                delete.isClickable = true
+                create.isClickable = true
+                layers.isClickable = true
+                pencil.isClickable = true
+                brush.isClickable = true
+                erase.isClickable = true
+                instruments.isClickable = true
+                color.isClickable = true
+
+                canvasView.pause()
+            }
+
+            play.setOnClickListener {
+                back.isInvisible = false
+                forward.isInvisible = false
+                delete.isInvisible = false
+                create.isInvisible = false
+                layers.isInvisible = false
+                pencil.isInvisible = false
+                brush.isInvisible = false
+                erase.isInvisible = false
+                instruments.isInvisible = false
+                color.isInvisible = false
+
+                back.isClickable = false
+                forward.isClickable = false
+                delete.isClickable = false
+                create.isClickable = false
+                layers.isClickable = false
+                pencil.isClickable = false
+                brush.isClickable = false
+                erase.isClickable = false
+                instruments.isClickable = false
+                color.isClickable = false
+
+
+                canvasView.play()
+            }
 
             pencil.setOnClickListener {
                 canvasView.setInstrument(CanvasView.Instrument.PENCIL)
@@ -179,7 +231,7 @@ class MainActivity : AppCompatActivity() {
             viewBinding.color.backgroundTintList =
                 ColorStateList.valueOf(resources.getColor(R.color.white, null))
             currentColor = R.color.white
-            viewBinding.canvasView.setColor(resources.getColor(R.color.white,null))
+            viewBinding.canvasView.setColor(resources.getColor(R.color.white, null))
             popUpWindow.dismiss()
         }
 
@@ -187,7 +239,7 @@ class MainActivity : AppCompatActivity() {
             viewBinding.color.backgroundTintList =
                 ColorStateList.valueOf(resources.getColor(R.color.orange, null))
             currentColor = R.color.orange
-            viewBinding.canvasView.setColor(resources.getColor(R.color.orange,null))
+            viewBinding.canvasView.setColor(resources.getColor(R.color.orange, null))
             popUpWindow.dismiss()
         }
 
@@ -195,7 +247,7 @@ class MainActivity : AppCompatActivity() {
             viewBinding.color.backgroundTintList =
                 ColorStateList.valueOf(resources.getColor(R.color.black, null))
             currentColor = R.color.black
-            viewBinding.canvasView.setColor(resources.getColor(R.color.black,null))
+            viewBinding.canvasView.setColor(resources.getColor(R.color.black, null))
             popUpWindow.dismiss()
         }
 
@@ -203,7 +255,7 @@ class MainActivity : AppCompatActivity() {
             viewBinding.color.backgroundTintList =
                 ColorStateList.valueOf(resources.getColor(R.color.blue, null))
             currentColor = R.color.blue
-            viewBinding.canvasView.setColor(resources.getColor(R.color.blue,null))
+            viewBinding.canvasView.setColor(resources.getColor(R.color.blue, null))
             popUpWindow.dismiss()
         }
     }
