@@ -13,11 +13,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.animatorforandroid.databinding.ActivityMainBinding
 import com.example.animatorforandroid.databinding.FragmentInstrumentsBinding
 import com.example.animatorforandroid.databinding.FragmentLayersBinding
 import com.example.animatorforandroid.databinding.FragmentPaletteBinding
+import com.example.animatorforandroid.databinding.FragmentSliderForInstrumentBinding
+import com.google.android.material.slider.Slider
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -113,6 +115,7 @@ class MainActivity : AppCompatActivity() {
                 canvasView.setColor(resources.getColor(currentColor, null))
 
                 setCurrentButton(Buttons.PENCIL)
+                showSlider()
             }
 
             brush.setOnClickListener {
@@ -120,6 +123,7 @@ class MainActivity : AppCompatActivity() {
                 canvasView.setColor(resources.getColor(currentColor, null))
 
                 setCurrentButton(Buttons.BRUSH)
+                showSlider()
             }
 
             erase.setOnClickListener {
@@ -127,6 +131,7 @@ class MainActivity : AppCompatActivity() {
                 canvasView.setColor(Color.TRANSPARENT)
 
                 setCurrentButton(Buttons.ERASE)
+                showSlider()
             }
 
             instruments.setOnClickListener {
@@ -288,30 +293,54 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createPopUpWindow(view: View): PopupWindow {
-        val popUpWindow = PopupWindow(
-            view,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            true
+    private fun showSlider() {
+        val popUpSliderBinding = FragmentSliderForInstrumentBinding.inflate(layoutInflater)
+
+        val popupWindow = createPopUpWindow(popUpSliderBinding.root)
+        popUpSliderBinding.slider.value = viewBinding.canvasView.getCurrentInstrumentWidth()
+        popUpSliderBinding.slider.setLabelFormatter {
+            "${it.roundToInt()}"
+        }
+        popUpSliderBinding.slider.addOnSliderTouchListener(
+            object : Slider.OnSliderTouchListener {
+                override fun onStartTrackingTouch(slider: Slider) {
+                    // Реагирует, когда событие касания ползунка запускается
+                }
+
+                override fun onStopTrackingTouch(slider: Slider) {
+                    // Реагирует, когда событие касания ползунка останавливается
+                    viewBinding.canvasView.setInstrumentWidth(slider.value.roundToInt().toFloat())
+                }
+            }
         )
 
-        popUpWindow.showAtLocation(
-            viewBinding.instruments,
-            Gravity.BOTTOM,
-            0,
-            dpToPx(124f, this)
-        )
-        return popUpWindow
     }
 
-    enum class Buttons {
-        NONE,
-        PENCIL,
-        BRUSH,
-        ERASE,
-        INSTRUMENTS,
-        COLOR,
-        PALETTE
-    }
+
+private fun createPopUpWindow(view: View): PopupWindow {
+    val popUpWindow = PopupWindow(
+        view,
+        LinearLayout.LayoutParams.WRAP_CONTENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT,
+        true
+    )
+
+    popUpWindow.showAtLocation(
+        viewBinding.instruments,
+        Gravity.BOTTOM,
+        0,
+        dpToPx(124f, this)
+    )
+    return popUpWindow
+}
+
+enum class Buttons {
+    NONE,
+    PENCIL,
+    BRUSH,
+    ERASE,
+    INSTRUMENTS,
+    COLOR,
+    PALETTE
+}
 }

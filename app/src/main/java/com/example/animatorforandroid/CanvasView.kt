@@ -12,7 +12,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
-import androidx.core.animation.addListener
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -34,8 +33,10 @@ class CanvasView @JvmOverloads constructor(
     private var animationActiveFrame = rootFrameNode
     private var animationFrameIndex = 0
     private var instrumentColor = Color.BLUE
-    private val instrumentStyle: Paint.Style = Paint.Style.STROKE
-    private var instrument = Instrument.NONE
+    private var currentInstrument = Instrument.NONE
+    private val instrumentMap: MutableMap<Instrument, Float> = mutableMapOf(
+        Instrument.NONE to DEFAULT_INSTRUMENT_WIDTH
+    )
     private var eventIndex = -1
     private var mX = 0f
     private var mY = 0f
@@ -45,7 +46,7 @@ class CanvasView @JvmOverloads constructor(
     private var paint = Paint().apply {
         isAntiAlias = true
         isDither = true
-        style = instrumentStyle
+        style = Paint.Style.STROKE
         alpha = 255
     }
     private val valueAnimator = ValueAnimator().apply {
@@ -65,11 +66,6 @@ class CanvasView @JvmOverloads constructor(
                 }
             }
         }
-        addListener(onEnd = {
-            isForAnimation = false
-            it.cancel()
-            invalidate()
-        })
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -86,10 +82,14 @@ class CanvasView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (isForAnimation) {
+            return false
+        }
+
         val x = event.x
         val y = event.y
 
-        if (instrument == Instrument.NONE) {
+        if (currentInstrument == Instrument.NONE) {
             return false
         }
 
@@ -113,8 +113,19 @@ class CanvasView @JvmOverloads constructor(
         return true
     }
 
+    fun setInstrumentWidth(size: Float) {
+        instrumentMap[currentInstrument] = size
+    }
+
+    fun getCurrentInstrumentWidth(): Float {
+        return instrumentMap[currentInstrument] ?: DEFAULT_INSTRUMENT_WIDTH
+    }
+
     fun setInstrument(instrument: Instrument) {
-        this.instrument = instrument
+        currentInstrument = instrument
+        if (!instrumentMap.containsKey(instrument)){
+            instrumentMap[instrument] = DEFAULT_INSTRUMENT_WIDTH
+        }
     }
 
     fun setColor(color: Int) {
@@ -174,16 +185,19 @@ class CanvasView @JvmOverloads constructor(
     }
 
     fun pause() {
+        isForAnimation = false
         valueAnimator.cancel()
+        invalidate()
     }
 
     private fun touchStart(x: Float, y: Float) {
-        if (instrument != Instrument.ERASE) {
+        if (currentInstrument != Instrument.ERASE) {
             path = Path()
             val canvasObject = CanvasObject(
                 path = path,
                 color = instrumentColor,
-                instrument = instrument,
+                instrument = currentInstrument,
+                width = instrumentMap[currentInstrument] ?: DEFAULT_INSTRUMENT_WIDTH,
                 isDelete = false
             )
 
@@ -200,7 +214,7 @@ class CanvasView @JvmOverloads constructor(
 
         }
 
-        when (instrument) {
+        when (currentInstrument) {
             Instrument.PENCIL, Instrument.BRUSH, Instrument.ERASE -> {
                 path.moveTo(x, y)
                 mX = x
@@ -217,7 +231,7 @@ class CanvasView @JvmOverloads constructor(
     }
 
     private fun touchMove(x: Float, y: Float) {
-        when (instrument) {
+        when (currentInstrument) {
             Instrument.PENCIL, Instrument.BRUSH -> {
                 val dx = abs(x - mX)
                 val dy = abs(y - mY)
@@ -232,7 +246,12 @@ class CanvasView @JvmOverloads constructor(
                 for (i in activeFrameNode.canvasObjectList.indices) {
                     if (
                         !activeFrameNode.canvasObjectList[i].isDelete &&
-                        isPointOnPath(activeFrameNode.canvasObjectList[i].path, x, y)
+                        isPointOnPath(
+                            activeFrameNode.canvasObjectList[i].path,
+                            instrumentMap[currentInstrument] ?: DEFAULT_INSTRUMENT_WIDTH,
+                            x,
+                            y
+                        )
                     ) {
                         activeFrameNode.canvasObjectList[i].isDelete = true
 
@@ -345,7 +364,7 @@ class CanvasView @JvmOverloads constructor(
     }
 
     private fun touchUp(x: Float, y: Float) {
-        when (instrument) {
+        when (currentInstrument) {
             Instrument.PENCIL, Instrument.BRUSH -> {
                 path.lineTo(mX, mY)
             }
@@ -354,7 +373,12 @@ class CanvasView @JvmOverloads constructor(
                 for (i in activeFrameNode.canvasObjectList.indices) {
                     if (
                         !activeFrameNode.canvasObjectList[i].isDelete &&
-                        isPointOnPath(activeFrameNode.canvasObjectList[i].path, x, y)
+                        isPointOnPath(
+                            activeFrameNode.canvasObjectList[i].path,
+                            instrumentMap[currentInstrument] ?: DEFAULT_INSTRUMENT_WIDTH,
+                            x,
+                            y
+                        )
                     ) {
                         activeFrameNode.canvasObjectList[i].isDelete = true
 
@@ -488,10 +512,10 @@ class CanvasView @JvmOverloads constructor(
         )
     }
 
-    private fun isPointOnPath(path: Path, x: Float, y: Float): Boolean {
+    private fun isPointOnPath(path: Path, width: Float, x: Float, y: Float): Boolean {
         val pathMeasure = PathMeasure(path, false)
         val pathLength = pathMeasure.length
-        val precision = 20f
+        val precision = width * 5
 
         val pos = FloatArray(2)
         val tan = FloatArray(2)
@@ -513,16 +537,15 @@ class CanvasView @JvmOverloads constructor(
             if (canvasObject.isDelete) {
                 continue
             }
+            paint.strokeWidth = canvasObject.width
 
             if (canvasObject.instrument == Instrument.PENCIL) {
                 with(paint) {
-                    strokeWidth = 4f
                     strokeJoin = Paint.Join.BEVEL
                     strokeCap = Paint.Cap.SQUARE
                 }
             } else {
                 with(paint) {
-                    strokeWidth = 16f
                     strokeJoin = Paint.Join.ROUND
                     strokeCap = Paint.Cap.ROUND
                 }
@@ -559,6 +582,7 @@ class CanvasView @JvmOverloads constructor(
         val color: Int,
         val instrument: Instrument,
         val path: Path,
+        val width: Float = DEFAULT_INSTRUMENT_WIDTH,
         var isDelete: Boolean
     )
 
@@ -572,5 +596,6 @@ class CanvasView @JvmOverloads constructor(
     companion object {
         private const val TOUCH_TOLERANCE = 4f
         private const val FRAME_DELAY = 300L
+        private const val DEFAULT_INSTRUMENT_WIDTH = 4f
     }
 }
