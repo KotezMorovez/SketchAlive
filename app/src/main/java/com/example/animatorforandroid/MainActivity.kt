@@ -13,8 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.animatorforandroid.databinding.ActivityMainBinding
 import com.example.animatorforandroid.databinding.FragmentInstrumentsBinding
+import com.example.animatorforandroid.databinding.FragmentLayersBinding
 import com.example.animatorforandroid.databinding.FragmentPaletteBinding
 
 class MainActivity : AppCompatActivity() {
@@ -221,10 +223,13 @@ class MainActivity : AppCompatActivity() {
         currentButton = button
     }
 
+    private fun showLayersList() {
+        val popUpLayersBinding = FragmentLayersBinding.inflate(layoutInflater)
+        val popupWindow = createPopUpWindow(popUpLayersBinding.root)
+    }
 
     private fun showPalette() {
         val popUpPaletteBinding = FragmentPaletteBinding.inflate(layoutInflater)
-
         val popUpWindow = createPopUpWindow(popUpPaletteBinding.root)
 
         popUpPaletteBinding.firstColor.setOnClickListener {
@@ -299,8 +304,6 @@ class MainActivity : AppCompatActivity() {
         )
         return popUpWindow
     }
-
-    private fun showLayersList() {}
 
     enum class Buttons {
         NONE,
