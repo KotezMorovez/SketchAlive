@@ -6,6 +6,8 @@
     <color name="button_inactive">#FFFFFFFF</color>
     <color name="button_active">#FFA8DB10</color>
 
+    <color name="transparent">#00000000</color>
+    <color name="translucent">#80000000</color>
     <color name="gray">#FF8B8B8B</color>
     <color name="dark_gray">#292A30</color>
     <color name="green">#FFA8DB10</color>

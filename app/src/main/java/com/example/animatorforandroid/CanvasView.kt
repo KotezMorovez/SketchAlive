@@ -3,6 +3,8 @@ package com.example.animatorforandroid
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.INFINITE
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -12,10 +14,14 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+
 
 class CanvasView @JvmOverloads constructor(
     context: Context,
@@ -25,11 +31,12 @@ class CanvasView @JvmOverloads constructor(
     private val eventList = ArrayList<Event>()
     private var frameIndex = 0L
     private var frameListSize = 1L
-    private val rootFrameNode = FrameNode(
+    private var rootFrameNode = FrameNode(
         id = frameIndex,
         canvasObjectList = arrayListOf()
     )
-    private var activeFrameNode = rootFrameNode
+    var activeFrameNode = rootFrameNode
+        private set
     private var animationActiveFrame = rootFrameNode
     private var animationFrameIndex = 0
     private var instrumentColor = Color.BLUE
@@ -43,6 +50,8 @@ class CanvasView @JvmOverloads constructor(
     private var startCoordX = 0f
     private var startCoordY = 0f
     private var isForAnimation = false
+    private var isForLayersManager = false
+    private var frameDelay = 300L
     private var paint = Paint().apply {
         isAntiAlias = true
         isDither = true
@@ -67,6 +76,14 @@ class CanvasView @JvmOverloads constructor(
             }
         }
     }
+    private val backgroundBitmap: Bitmap by lazy {
+        compressBitmap(
+            BitmapFactory.decodeResource(resources, R.drawable.canvas),
+            this.width,
+            this.height
+        )
+    }
+    private val canvas = Canvas()
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -82,7 +99,7 @@ class CanvasView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (isForAnimation) {
+        if (isForAnimation || isForLayersManager) {
             return false
         }
 
@@ -121,9 +138,37 @@ class CanvasView @JvmOverloads constructor(
         return instrumentMap[currentInstrument] ?: DEFAULT_INSTRUMENT_WIDTH
     }
 
+    fun getCurrentAnimationSpeed(): Float {
+        return when (frameDelay) {
+            300L -> {
+                1f
+            }
+
+            200L -> {
+                2f
+            }
+
+            else -> {
+                3f
+            }
+        }
+    }
+
+    fun setAnimationSpeed(speed: Float) {
+        frameDelay = when (speed.toInt()) {
+            1 -> { 300L }
+
+            2 -> { 200L }
+
+            else -> { 100L }
+        }
+
+        valueAnimator.duration = frameDelay * frameListSize
+    }
+
     fun setInstrument(instrument: Instrument) {
         currentInstrument = instrument
-        if (!instrumentMap.containsKey(instrument)){
+        if (!instrumentMap.containsKey(instrument)) {
             instrumentMap[instrument] = DEFAULT_INSTRUMENT_WIDTH
         }
     }
@@ -133,10 +178,23 @@ class CanvasView @JvmOverloads constructor(
         paint.color = color
     }
 
-    fun clear() {
-        activeFrameNode.canvasObjectList.clear()
-        eventList.clear()
-        eventIndex = -1
+    fun deleteFrame() {
+        // активная нода удаляется, переход на предыдущую
+        if (activeFrameNode != rootFrameNode) {
+            activeFrameNode.prev?.next = activeFrameNode.next
+            activeFrameNode.next?.prev = activeFrameNode.prev
+            activeFrameNode = activeFrameNode.prev!!
+            eventList.clear()
+            eventIndex = -1
+        } else {
+            // если удаляем первую ноду - переходим на следующую или очищаем, если корневая = единственная
+            rootFrameNode = rootFrameNode.next ?: FrameNode(
+                id = frameIndex,
+                canvasObjectList = arrayListOf()
+            )
+            rootFrameNode.prev = null
+            activeFrameNode = rootFrameNode
+        }
         invalidate()
     }
 
@@ -147,7 +205,15 @@ class CanvasView @JvmOverloads constructor(
             canvasObjectList = arrayListOf(),
             prev = activeFrameNode
         )
-        activeFrameNode.next = newFrameNode
+
+        if (activeFrameNode.next == null) {
+            activeFrameNode.next = newFrameNode
+        } else {
+            newFrameNode.next = activeFrameNode.next
+            activeFrameNode.next?.prev = newFrameNode
+            activeFrameNode.next = newFrameNode
+        }
+
         activeFrameNode = newFrameNode
         frameListSize++
         clear()
@@ -175,11 +241,11 @@ class CanvasView @JvmOverloads constructor(
 
     fun play() {
         isForAnimation = true
-        animationFrameIndex = -1
+        animationFrameIndex = 0
 
-        valueAnimator.duration = FRAME_DELAY * frameListSize
+        valueAnimator.duration = frameDelay * frameListSize
 
-        valueAnimator.setIntValues(0, frameListSize.toInt()) //?????
+        valueAnimator.setIntValues(0, frameListSize.toInt())
 
         valueAnimator.start()
     }
@@ -188,6 +254,202 @@ class CanvasView @JvmOverloads constructor(
         isForAnimation = false
         valueAnimator.cancel()
         invalidate()
+    }
+
+    fun duplicateActiveFrame() {
+        frameIndex++
+        val newFrameNode = FrameNode(
+            id = frameIndex,
+            canvasObjectList = ArrayList(activeFrameNode.canvasObjectList),
+            prev = activeFrameNode,
+            next = activeFrameNode.next
+        )
+        activeFrameNode.next?.prev = newFrameNode
+        activeFrameNode.next = newFrameNode
+        activeFrameNode = newFrameNode
+        frameListSize++
+        invalidate()
+    }
+
+    fun showFrame(frameNode: FrameNode) {
+        activeFrameNode = frameNode
+        invalidate()
+    }
+
+    fun deleteAllFrames() {
+        rootFrameNode.canvasObjectList.clear()
+        rootFrameNode.next = null
+        activeFrameNode = rootFrameNode
+        frameListSize = 1L
+        invalidate()
+    }
+
+    fun getBitmapList(): List<Pair<FrameNode, Bitmap>> {
+        isForLayersManager = true
+        val result: ArrayList<Pair<FrameNode, Bitmap>> = arrayListOf()
+
+        result.add(createBitmapPair(activeFrameNode))
+
+        if (activeFrameNode == rootFrameNode) {
+            if (activeFrameNode.next != null) {
+                result.add(createBitmapPair(activeFrameNode.next!!))
+
+                if (activeFrameNode.next!!.next != null) {
+                    result.add(createBitmapPair(activeFrameNode.next!!.next!!))
+                }
+            }
+            return result
+        }
+
+        if (activeFrameNode.next == null) {
+            if (activeFrameNode.prev != null) {
+                result.add(0, createBitmapPair(activeFrameNode.prev!!))
+
+                if (activeFrameNode.prev!!.prev != null) {
+                    result.add(0, createBitmapPair(activeFrameNode.prev!!.prev!!))
+                }
+            }
+            return result
+        }
+
+
+        result.add(0, createBitmapPair(activeFrameNode.prev!!))
+        result.add(createBitmapPair(activeFrameNode.next!!))
+        return result
+    }
+
+    fun closeLayersManager() {
+        isForLayersManager = false
+    }
+
+    fun moveBack() {
+        activeFrameNode = activeFrameNode.prev ?: return
+        invalidate()
+    }
+
+    fun moveForward() {
+        activeFrameNode = activeFrameNode.next ?: return
+        invalidate()
+    }
+
+    fun generateGif(): String {
+        var actualFrameNode: FrameNode? = rootFrameNode
+        val root = context.cacheDir.absolutePath + "/animator_gif_cache"
+        val cacheUri = "$root/animation.gif"
+        val dir = File(root)
+
+        dir.mkdir()
+        val writer = AnimatedGIFWriter(true)
+        val output= FileOutputStream(cacheUri)
+        writer.prepareForWrite(output, -1, -1)
+
+        do {
+            val bitmap = createBitmapFullSize(actualFrameNode!!)
+            writer.writeFrame(output, bitmap)
+            actualFrameNode = actualFrameNode.next
+        } while (actualFrameNode != null)
+
+        writer.finishWrite(output)
+        return cacheUri
+    }
+
+    private fun clear() {
+        activeFrameNode.canvasObjectList.clear()
+        eventList.clear()
+        eventIndex = -1
+        invalidate()
+    }
+
+    private fun createBitmapFullSize(frameNode: FrameNode): Bitmap {
+        val bitmap = backgroundBitmap.copy(Bitmap.Config.ARGB_8888, true)
+        canvas.setBitmap(bitmap)
+        drawFrame(frameNode.canvasObjectList, canvas, false)
+        return bitmap
+    }
+
+    private fun createBitmapPair(frameNode: FrameNode): Pair<FrameNode, Bitmap> {
+        val bitmap = createBitmapFullSize(frameNode)
+        return Pair(frameNode, compressBitmap(bitmap, 128, 218)) // ~ 16:9
+    }
+
+    private fun compressBitmap(bitmap: Bitmap, width: Int, height: Int): Bitmap {
+        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
+        val outputStream = ByteArrayOutputStream()
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 25, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    }
+
+    private fun calculateArrowCoords(
+        length: Float,
+        headAngle: Double,
+        x: Float,
+        y: Float
+    ): FloatArray {
+        val angle = atan2(y - startCoordY, x - startCoordX)
+
+        val arrowX1 = x - length * cos(angle - Math.toRadians(headAngle))
+        val arrowY1 = y - length * sin(angle - Math.toRadians(headAngle))
+
+        val arrowX2 = x - length * cos(angle + Math.toRadians(headAngle))
+        val arrowY2 = y - length * sin(angle + Math.toRadians(headAngle))
+
+        return floatArrayOf(
+            arrowX1.toFloat(),
+            arrowY1.toFloat(),
+            arrowX2.toFloat(),
+            arrowY2.toFloat()
+        )
+    }
+
+    private fun isPointOnPath(path: Path, width: Float, x: Float, y: Float): Boolean {
+        val pathMeasure = PathMeasure(path, false)
+        val pathLength = pathMeasure.length
+        val precision = width * 5
+
+        val pos = FloatArray(2)
+        val tan = FloatArray(2)
+
+        var distance = 0f
+        while (distance < pathLength) {
+            pathMeasure.getPosTan(distance, pos, tan)
+            if (abs(pos[0] - x) < precision && abs(pos[1] - y) < precision) {
+                return true
+            }
+            distance += precision
+        }
+
+        return false
+    }
+
+    private fun drawFrame(list: List<CanvasObject>, canvas: Canvas, isTranslucent: Boolean) {
+        for (canvasObject in list) {
+            if (canvasObject.isDelete) {
+                continue
+            }
+            paint.strokeWidth = canvasObject.width
+
+            if (canvasObject.instrument == Instrument.PENCIL) {
+                with(paint) {
+                    strokeJoin = Paint.Join.BEVEL
+                    strokeCap = Paint.Cap.SQUARE
+                }
+            } else {
+                with(paint) {
+                    strokeJoin = Paint.Join.ROUND
+                    strokeCap = Paint.Cap.ROUND
+                }
+            }
+
+            if (isTranslucent) {
+                val translucentColor = canvasObject.color and 0x00ffffff or (70 shl 24)
+                paint.color = translucentColor
+            } else {
+                paint.color = canvasObject.color
+            }
+
+            canvas.drawPath(canvasObject.path, paint)
+        }
     }
 
     private fun touchStart(x: Float, y: Float) {
@@ -490,78 +752,6 @@ class CanvasView @JvmOverloads constructor(
         }
     }
 
-    private fun calculateArrowCoords(
-        length: Float,
-        headAngle: Double,
-        x: Float,
-        y: Float
-    ): FloatArray {
-        val angle = atan2(y - startCoordY, x - startCoordX)
-
-        val arrowX1 = x - length * cos(angle - Math.toRadians(headAngle))
-        val arrowY1 = y - length * sin(angle - Math.toRadians(headAngle))
-
-        val arrowX2 = x - length * cos(angle + Math.toRadians(headAngle))
-        val arrowY2 = y - length * sin(angle + Math.toRadians(headAngle))
-
-        return floatArrayOf(
-            arrowX1.toFloat(),
-            arrowY1.toFloat(),
-            arrowX2.toFloat(),
-            arrowY2.toFloat()
-        )
-    }
-
-    private fun isPointOnPath(path: Path, width: Float, x: Float, y: Float): Boolean {
-        val pathMeasure = PathMeasure(path, false)
-        val pathLength = pathMeasure.length
-        val precision = width * 5
-
-        val pos = FloatArray(2)
-        val tan = FloatArray(2)
-
-        var distance = 0f
-        while (distance < pathLength) {
-            pathMeasure.getPosTan(distance, pos, tan)
-            if (abs(pos[0] - x) < precision && abs(pos[1] - y) < precision) {
-                return true
-            }
-            distance += precision
-        }
-
-        return false
-    }
-
-    private fun drawFrame(list: List<CanvasObject>, canvas: Canvas, isTranslucent: Boolean) {
-        for (canvasObject in list) {
-            if (canvasObject.isDelete) {
-                continue
-            }
-            paint.strokeWidth = canvasObject.width
-
-            if (canvasObject.instrument == Instrument.PENCIL) {
-                with(paint) {
-                    strokeJoin = Paint.Join.BEVEL
-                    strokeCap = Paint.Cap.SQUARE
-                }
-            } else {
-                with(paint) {
-                    strokeJoin = Paint.Join.ROUND
-                    strokeCap = Paint.Cap.ROUND
-                }
-            }
-
-            if (isTranslucent) {
-                val translucentColor = canvasObject.color and 0x00ffffff or (70 shl 24)
-                paint.color = translucentColor
-            } else {
-                paint.color = canvasObject.color
-            }
-
-            canvas.drawPath(canvasObject.path, paint)
-        }
-    }
-
     enum class Instrument {
         NONE,
         PENCIL,
@@ -595,7 +785,6 @@ class CanvasView @JvmOverloads constructor(
 
     companion object {
         private const val TOUCH_TOLERANCE = 4f
-        private const val FRAME_DELAY = 300L
         private const val DEFAULT_INSTRUMENT_WIDTH = 4f
     }
 }
