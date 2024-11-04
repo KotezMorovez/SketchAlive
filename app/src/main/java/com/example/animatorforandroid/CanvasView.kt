@@ -60,19 +60,17 @@ class CanvasView @JvmOverloads constructor(
     }
     private val valueAnimator = ValueAnimator().apply {
         repeatCount = INFINITE
-        duration = 5_000L
         interpolator = LinearInterpolator()
         addUpdateListener {
-            if (it.animatedValue != animationFrameIndex) {
-                animationFrameIndex = it.animatedValue as Int
+            if ((it.animatedValue as Float).toInt() != animationFrameIndex) {
+                animationFrameIndex = (it.animatedValue as Float).toInt()
 
-                if (animationActiveFrame.next != null) {
-                    animationActiveFrame = animationActiveFrame.next!!
-                    invalidate()
+                animationActiveFrame = if (animationActiveFrame.next != null) {
+                    animationActiveFrame.next!!
                 } else {
-                    animationActiveFrame = rootFrameNode
-                    invalidate()
+                    rootFrameNode
                 }
+                invalidate()
             }
         }
     }
@@ -243,8 +241,10 @@ class CanvasView @JvmOverloads constructor(
 
         valueAnimator.duration = frameDelay * frameListSize
 
-        valueAnimator.setIntValues(0, frameListSize.toInt())
+        valueAnimator.setFloatValues(0.01f, frameListSize.toFloat()-0.01f)
 
+        animationActiveFrame = rootFrameNode
+        invalidate()
         valueAnimator.start()
     }
 
