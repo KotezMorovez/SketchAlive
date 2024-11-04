@@ -33,7 +33,8 @@ import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
-    private var currentColor = R.color.blue
+    private lateinit var paletteViewBinding: FragmentPaletteBinding
+    private var currentARGBColor = Color.argb(0, 0, 0, 0)
     private var currentButton = Buttons.NONE
     private var layersPreview = listOf<Pair<CanvasView.FrameNode, Bitmap>>()
     private var layersPreviewList: ArrayList<ImageView> = arrayListOf()
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        paletteViewBinding = FragmentPaletteBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
         initUI()
@@ -119,15 +121,14 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 lifecycleScope.launch(Dispatchers.IO) {
-                    canvasView.generateGif()
                     val file = File(canvasView.generateGif())
                     loaderView.stopLoader()
 
                     launch(Dispatchers.Main) {
-                          gifLoader.isGone = true
+                        gifLoader.isGone = true
                         val uriToGif = FileProvider.getUriForFile(
                             Objects.requireNonNull(applicationContext),
-                          "com.example.animatorforandroid.provider",
+                            "com.example.animatorforandroid.provider",
                             file
                         )
                         val shareIntent = Intent(Intent.ACTION_SEND)
@@ -143,7 +144,7 @@ class MainActivity : AppCompatActivity() {
 
             pencil.setOnClickListener {
                 canvasView.setInstrument(CanvasView.Instrument.PENCIL)
-                canvasView.setColor(resources.getColor(currentColor, null))
+                canvasView.setColor(currentARGBColor)
 
                 setCurrentButton(Buttons.PENCIL)
                 showSlider()
@@ -151,7 +152,7 @@ class MainActivity : AppCompatActivity() {
 
             brush.setOnClickListener {
                 canvasView.setInstrument(CanvasView.Instrument.BRUSH)
-                canvasView.setColor(resources.getColor(currentColor, null))
+                canvasView.setColor(currentARGBColor)
 
                 setCurrentButton(Buttons.BRUSH)
                 showSlider()
@@ -168,7 +169,7 @@ class MainActivity : AppCompatActivity() {
             instruments.setOnClickListener {
                 showInstruments()
                 setCurrentButton(Buttons.INSTRUMENTS)
-                canvasView.setColor(resources.getColor(currentColor, null))
+                canvasView.setColor(currentARGBColor)
             }
 
             color.setOnClickListener {
@@ -210,10 +211,6 @@ class MainActivity : AppCompatActivity() {
                     it.color.setImageDrawable(null)
                 }
 
-                Buttons.PALETTE -> {
-                    // TODO
-                }
-
                 else -> {}
             }
 
@@ -247,10 +244,6 @@ class MainActivity : AppCompatActivity() {
                             null
                         )
                     )
-                }
-
-                Buttons.PALETTE -> {
-                    // TODO
                 }
 
                 else -> {}
@@ -342,39 +335,55 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPalette() {
-        val popUpPaletteBinding = FragmentPaletteBinding.inflate(layoutInflater)
-        val popUpWindow = createPopUpWindow(popUpPaletteBinding.root)
+        val popUpWindow = createPopUpWindow(paletteViewBinding.root)
 
-        popUpPaletteBinding.firstColor.setOnClickListener {
-            viewBinding.color.backgroundTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.white, null))
-            currentColor = R.color.white
-            viewBinding.canvasView.setColor(resources.getColor(R.color.white, null))
+        paletteViewBinding.firstColor.setOnClickListener {
+            currentARGBColor = Color.argb(255, 255, 255, 255)
+            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
+            viewBinding.color.setBackgroundTintList(
+                ColorStateList.valueOf(Color.parseColor(hexColor))
+            )
+            viewBinding.canvasView.setColor(this.currentARGBColor)
             popUpWindow.dismiss()
         }
 
-        popUpPaletteBinding.secondColor.setOnClickListener {
-            viewBinding.color.backgroundTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.orange, null))
-            currentColor = R.color.orange
-            viewBinding.canvasView.setColor(resources.getColor(R.color.orange, null))
+        paletteViewBinding.secondColor.setOnClickListener {
+            currentARGBColor = Color.argb(255, 255, 61, 0)
+            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
+            viewBinding.color.setBackgroundTintList(
+                ColorStateList.valueOf(Color.parseColor(hexColor))
+            )
+            viewBinding.canvasView.setColor(currentARGBColor)
             popUpWindow.dismiss()
         }
 
-        popUpPaletteBinding.thirdColor.setOnClickListener {
-            viewBinding.color.backgroundTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.black, null))
-            currentColor = R.color.black
-            viewBinding.canvasView.setColor(resources.getColor(R.color.black, null))
+        paletteViewBinding.thirdColor.setOnClickListener {
+            currentARGBColor = Color.argb(255, 0, 0, 0)
+            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
+            viewBinding.color.setBackgroundTintList(
+                ColorStateList.valueOf(Color.parseColor(hexColor))
+            )
+            viewBinding.canvasView.setColor(currentARGBColor)
             popUpWindow.dismiss()
         }
 
-        popUpPaletteBinding.fourthColor.setOnClickListener {
-            viewBinding.color.backgroundTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.blue, null))
-            currentColor = R.color.blue
-            viewBinding.canvasView.setColor(resources.getColor(R.color.blue, null))
+        paletteViewBinding.fourthColor.setOnClickListener {
+            currentARGBColor = Color.argb(255, 25, 118, 210)
+            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
+            viewBinding.color.setBackgroundTintList(
+                ColorStateList.valueOf(Color.parseColor(hexColor))
+            )
+            viewBinding.canvasView.setColor(currentARGBColor)
             popUpWindow.dismiss()
+        }
+
+        paletteViewBinding.colorWheel.setColorChangeListener {
+            currentARGBColor = it ?: Color.argb(255, 0, 0, 0)
+            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
+            viewBinding.color.setBackgroundTintList(
+                ColorStateList.valueOf(Color.parseColor(hexColor))
+            )
+            viewBinding.canvasView.setColor(currentARGBColor)
         }
     }
 
@@ -594,7 +603,6 @@ class MainActivity : AppCompatActivity() {
         BRUSH,
         ERASE,
         INSTRUMENTS,
-        COLOR,
-        PALETTE
+        COLOR
     }
 }

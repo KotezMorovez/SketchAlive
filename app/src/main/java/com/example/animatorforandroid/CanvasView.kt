@@ -22,7 +22,6 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-
 class CanvasView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -39,14 +38,14 @@ class CanvasView @JvmOverloads constructor(
         private set
     private var animationActiveFrame = rootFrameNode
     private var animationFrameIndex = 0
-    private var instrumentColor = Color.BLUE
+    private var instrumentColor = Color.argb(255, 25, 118, 210)
     private var currentInstrument = Instrument.NONE
     private val instrumentMap: MutableMap<Instrument, Float> = mutableMapOf(
         Instrument.NONE to DEFAULT_INSTRUMENT_WIDTH
     )
     private var eventIndex = -1
-    private var mX = 0f
-    private var mY = 0f
+    private var touchX = 0f
+    private var touchY = 0f
     private var startCoordX = 0f
     private var startCoordY = 0f
     private var isForAnimation = false
@@ -179,7 +178,6 @@ class CanvasView @JvmOverloads constructor(
     }
 
     fun deleteFrame() {
-        // активная нода удаляется, переход на предыдущую
         if (activeFrameNode != rootFrameNode) {
             activeFrameNode.prev?.next = activeFrameNode.next
             activeFrameNode.next?.prev = activeFrameNode.prev
@@ -187,7 +185,6 @@ class CanvasView @JvmOverloads constructor(
             eventList.clear()
             eventIndex = -1
         } else {
-            // если удаляем первую ноду - переходим на следующую или очищаем, если корневая = единственная
             rootFrameNode = rootFrameNode.next ?: FrameNode(
                 id = frameIndex,
                 canvasObjectList = arrayListOf()
@@ -479,8 +476,8 @@ class CanvasView @JvmOverloads constructor(
         when (currentInstrument) {
             Instrument.PENCIL, Instrument.BRUSH, Instrument.ERASE -> {
                 path.moveTo(x, y)
-                mX = x
-                mY = y
+                touchX = x
+                touchY = y
             }
 
             Instrument.CIRCLE, Instrument.RECTANGLE, Instrument.TRIANGLE, Instrument.ARROW -> {
@@ -495,12 +492,12 @@ class CanvasView @JvmOverloads constructor(
     private fun touchMove(x: Float, y: Float) {
         when (currentInstrument) {
             Instrument.PENCIL, Instrument.BRUSH -> {
-                val dx = abs(x - mX)
-                val dy = abs(y - mY)
+                val dx = abs(x - touchX)
+                val dy = abs(y - touchY)
                 if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-                    path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2)
-                    mX = x
-                    mY = y
+                    path.quadTo(touchX, touchY, (x + touchX) / 2, (y + touchY) / 2)
+                    touchX = x
+                    touchY = y
                 }
             }
 
@@ -528,8 +525,8 @@ class CanvasView @JvmOverloads constructor(
                     }
                 }
 
-                mX = x
-                mY = y
+                touchX = x
+                touchY = y
             }
 
             Instrument.CIRCLE -> {
@@ -628,7 +625,7 @@ class CanvasView @JvmOverloads constructor(
     private fun touchUp(x: Float, y: Float) {
         when (currentInstrument) {
             Instrument.PENCIL, Instrument.BRUSH -> {
-                path.lineTo(mX, mY)
+                path.lineTo(touchX, touchY)
             }
 
             Instrument.ERASE -> {
@@ -655,8 +652,8 @@ class CanvasView @JvmOverloads constructor(
                     }
                 }
 
-                mX = x
-                mY = y
+                touchX = x
+                touchY = y
             }
 
             Instrument.CIRCLE -> {
