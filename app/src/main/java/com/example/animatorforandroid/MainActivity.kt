@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     private lateinit var paletteViewBinding: FragmentPaletteBinding
-    private var currentARGBColor = Color.argb(0, 0, 0, 0)
+    private var currentARGBColor = Color.argb(255, 25, 118, 210)
     private var currentButton = Buttons.NONE
     private var layersPreview = listOf<Pair<CanvasView.FrameNode, Bitmap>>()
     private var layersPreviewList: ArrayList<ImageView> = arrayListOf()
@@ -324,6 +324,14 @@ class MainActivity : AppCompatActivity() {
             deleteAll.setOnClickListener {
                 viewBinding.canvasView.deleteAllFrames()
                 layersPreview = viewBinding.canvasView.getBitmapList()
+                setAllPreviewsInactive()
+                layersPreviewList[0].setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        this@MainActivity.resources,
+                        R.drawable.layer_preview_active,
+                        null
+                    )
+                )
                 invalidateLayersPreview()
             }
 
@@ -394,18 +402,22 @@ class MainActivity : AppCompatActivity() {
 
         popUpInstrumentsBinding.rectangle.setOnClickListener {
             viewBinding.canvasView.setInstrument(CanvasView.Instrument.RECTANGLE)
+            viewBinding.canvasView.setInstrumentWidth(16f)
             popUpWindow.dismiss()
         }
         popUpInstrumentsBinding.circle.setOnClickListener {
             viewBinding.canvasView.setInstrument(CanvasView.Instrument.CIRCLE)
+            viewBinding.canvasView.setInstrumentWidth(16f)
             popUpWindow.dismiss()
         }
         popUpInstrumentsBinding.triangle.setOnClickListener {
             viewBinding.canvasView.setInstrument(CanvasView.Instrument.TRIANGLE)
+            viewBinding.canvasView.setInstrumentWidth(16f)
             popUpWindow.dismiss()
         }
         popUpInstrumentsBinding.arrow.setOnClickListener {
             viewBinding.canvasView.setInstrument(CanvasView.Instrument.ARROW)
+            viewBinding.canvasView.setInstrumentWidth(16f)
             popUpWindow.dismiss()
         }
     }

@@ -52,6 +52,7 @@ class CanvasView @JvmOverloads constructor(
     private var isForLayersManager = false
     private var frameDelay = 300L
     private var paint = Paint().apply {
+        color = instrumentColor
         isAntiAlias = true
         isDither = true
         style = Paint.Style.STROKE
