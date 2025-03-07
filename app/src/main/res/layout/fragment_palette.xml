@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:paddingVertical="16dp">
 
-    <com.example.animatorforandroid.ColorWheelView
+    <com.example.animatorforandroid.ui.common.ColorWheelView
         android:id="@+id/colorWheel"
         android:layout_width="192dp"
         android:layout_height="192dp"

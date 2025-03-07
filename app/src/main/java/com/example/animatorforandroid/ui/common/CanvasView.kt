@@ -1,4 +1,4 @@
-package com.example.animatorforandroid
+package com.example.animatorforandroid.ui.common
 
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.INFINITE
@@ -14,6 +14,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
+import com.example.animatorforandroid.data.AnimatedGIFWriter
+import com.example.animatorforandroid.R
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
