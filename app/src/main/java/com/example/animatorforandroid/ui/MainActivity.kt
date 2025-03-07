@@ -1,40 +1,43 @@
-package com.example.animatorforandroid
+package com.example.animatorforandroid.ui
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Outline
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.example.animatorforandroid.R
 import com.example.animatorforandroid.databinding.ActivityMainBinding
 import com.example.animatorforandroid.databinding.FragmentInstrumentsBinding
 import com.example.animatorforandroid.databinding.FragmentPaletteBinding
 import com.example.animatorforandroid.databinding.FragmentSliderForInstrumentBinding
+import com.example.animatorforandroid.ui.common.CanvasView
+import com.example.animatorforandroid.ui.common.createPopUpWindow
 import com.google.android.material.slider.Slider
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Objects
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
-    private lateinit var paletteViewBinding: FragmentPaletteBinding
-    private var currentARGBColor = Color.argb(255, 25, 118, 210)
+
+    @Inject
+    lateinit var paletteHandler: PaletteHandler
     private var currentButton = Buttons.NONE
     private var layersPreview = listOf<Pair<CanvasView.FrameNode, Bitmap>>()
     private var layersPreviewList: ArrayList<ImageView> = arrayListOf()
@@ -42,7 +45,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
-        paletteViewBinding = FragmentPaletteBinding.inflate(layoutInflater)
+        val paletteBinding = FragmentPaletteBinding.inflate(layoutInflater)
+        paletteHandler.apply {
+            setPaletteBinding(paletteBinding)
+            setListener { colors: PaletteHandlerImpl.Colors ->
+                val colorStateList = colors.tint
+                val currentColor = colors.color
+                viewBinding.color.backgroundTintList = colorStateList
+                viewBinding.canvasView.setColor(currentColor)
+            }
+
+        }
         setContentView(viewBinding.root)
 
         initUI()
@@ -144,7 +157,8 @@ class MainActivity : AppCompatActivity() {
 
             pencil.setOnClickListener {
                 canvasView.setInstrument(CanvasView.Instrument.PENCIL)
-                canvasView.setColor(currentARGBColor)
+                val currentColor = paletteHandler.getColor()
+                canvasView.setColor(currentColor)
 
                 setCurrentButton(Buttons.PENCIL)
                 showSlider()
@@ -152,7 +166,8 @@ class MainActivity : AppCompatActivity() {
 
             brush.setOnClickListener {
                 canvasView.setInstrument(CanvasView.Instrument.BRUSH)
-                canvasView.setColor(currentARGBColor)
+                val currentColor = paletteHandler.getColor()
+                canvasView.setColor(currentColor)
 
                 setCurrentButton(Buttons.BRUSH)
                 showSlider()
@@ -169,11 +184,12 @@ class MainActivity : AppCompatActivity() {
             instruments.setOnClickListener {
                 showInstruments()
                 setCurrentButton(Buttons.INSTRUMENTS)
-                canvasView.setColor(currentARGBColor)
+                val currentColor = paletteHandler.getColor()
+                canvasView.setColor(currentColor)
             }
 
             color.setOnClickListener {
-                showPalette()
+                paletteHandler.showPalette()
                 setCurrentButton(Buttons.COLOR)
             }
         }
@@ -342,59 +358,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showPalette() {
-        val popUpWindow = createPopUpWindow(paletteViewBinding.root)
-
-        paletteViewBinding.firstColor.setOnClickListener {
-            currentARGBColor = Color.argb(255, 255, 255, 255)
-            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
-            viewBinding.color.setBackgroundTintList(
-                ColorStateList.valueOf(Color.parseColor(hexColor))
-            )
-            viewBinding.canvasView.setColor(this.currentARGBColor)
-            popUpWindow.dismiss()
-        }
-
-        paletteViewBinding.secondColor.setOnClickListener {
-            currentARGBColor = Color.argb(255, 255, 61, 0)
-            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
-            viewBinding.color.setBackgroundTintList(
-                ColorStateList.valueOf(Color.parseColor(hexColor))
-            )
-            viewBinding.canvasView.setColor(currentARGBColor)
-            popUpWindow.dismiss()
-        }
-
-        paletteViewBinding.thirdColor.setOnClickListener {
-            currentARGBColor = Color.argb(255, 0, 0, 0)
-            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
-            viewBinding.color.setBackgroundTintList(
-                ColorStateList.valueOf(Color.parseColor(hexColor))
-            )
-            viewBinding.canvasView.setColor(currentARGBColor)
-            popUpWindow.dismiss()
-        }
-
-        paletteViewBinding.fourthColor.setOnClickListener {
-            currentARGBColor = Color.argb(255, 25, 118, 210)
-            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
-            viewBinding.color.setBackgroundTintList(
-                ColorStateList.valueOf(Color.parseColor(hexColor))
-            )
-            viewBinding.canvasView.setColor(currentARGBColor)
-            popUpWindow.dismiss()
-        }
-
-        paletteViewBinding.colorWheel.setColorChangeListener {
-            currentARGBColor = it ?: Color.argb(255, 0, 0, 0)
-            val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
-            viewBinding.color.setBackgroundTintList(
-                ColorStateList.valueOf(Color.parseColor(hexColor))
-            )
-            viewBinding.canvasView.setColor(currentARGBColor)
-        }
-    }
-
     private fun showInstruments() {
         val popUpInstrumentsBinding = FragmentInstrumentsBinding.inflate(layoutInflater)
 
@@ -445,26 +408,9 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun createPopUpWindow(view: View): PopupWindow {
-        val popUpWindow = PopupWindow(
-            view,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            true
-        )
-
-        popUpWindow.showAtLocation(
-            viewBinding.instruments,
-            Gravity.BOTTOM,
-            0,
-            dpToPx(124f, this)
-        )
-        return popUpWindow
-    }
-
     private fun invalidateLayersPreview() {
         with(viewBinding) {
-            layer1.background = BitmapDrawable(resources, layersPreview[0].second)
+            layer1.background = layersPreview[0].second.toDrawable(resources)
 
             layer1.setOnClickListener {
                 setAllPreviewsInactive()
@@ -480,7 +426,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (layersPreview.size > 1) {
-                layer2.background = BitmapDrawable(resources, layersPreview[1].second)
+                layer2.background = layersPreview[1].second.toDrawable(resources)
 
                 layer2.setOnClickListener {
                     setAllPreviewsInactive()
@@ -500,7 +446,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (layersPreview.size > 2) {
-                layer3.background = BitmapDrawable(resources, layersPreview[2].second)
+                layer3.background = layersPreview[2].second.toDrawable(resources)
 
                 layer3.setOnClickListener {
                     setAllPreviewsInactive()

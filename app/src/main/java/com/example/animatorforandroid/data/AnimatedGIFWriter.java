@@ -17,7 +17,7 @@
  * WY    27Oct2015  Initial creation
  */
 
-package com.example.animatorforandroid;
+package com.example.animatorforandroid.data;
 
 import java.io.IOException;
 import java.io.OutputStream;

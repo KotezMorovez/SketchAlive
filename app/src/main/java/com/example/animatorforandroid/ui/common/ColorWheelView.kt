@@ -1,4 +1,4 @@
-package com.example.animatorforandroid
+package com.example.animatorforandroid.ui.common
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -8,13 +8,14 @@ import android.graphics.Paint
 import android.graphics.Shader
 import android.graphics.SweepGradient
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.graphics.get
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+import androidx.core.graphics.createBitmap
 
 class ColorWheelView @JvmOverloads constructor(
     context: Context,
@@ -39,7 +40,7 @@ class ColorWheelView @JvmOverloads constructor(
         Color.argb(255, 255, 0, 0)
     )
     private var currentColor = Color.argb(0, 0, 0, 0)
-    private var bitmap: Bitmap = Bitmap.createBitmap(10,10, Bitmap.Config.ARGB_8888)
+    private var bitmap: Bitmap = createBitmap(10, 10)
     private var wheelCanvas: Canvas = Canvas(bitmap)
 
     init {
@@ -59,7 +60,7 @@ class ColorWheelView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        bitmap = createBitmap(w, h)
         wheelCanvas = Canvas(bitmap)
     }
 
@@ -73,12 +74,8 @@ class ColorWheelView @JvmOverloads constructor(
         super.onDraw(canvas)
         wheelCanvas.drawCircle(cX, cY, COLOR_WHEEL_RADIUS, colorWheel)
         canvas.drawBitmap(bitmap, 0f, 0f, null)
-        Log.e("DDD", "width: ${bitmap.width}")
         if (touchX < bitmap.width && touchY < bitmap.height) {
-            currentColor = bitmap.getPixel(
-                touchX.toInt(),
-                touchY.toInt()
-            )
+            currentColor = bitmap[touchX.toInt(), touchY.toInt()]
         }
 
         pointer.setColor(currentColor)

@@ -1,4 +1,4 @@
-package com.example.animatorforandroid
+package com.example.animatorforandroid.utils
 
 import android.content.Context
 import android.util.DisplayMetrics
