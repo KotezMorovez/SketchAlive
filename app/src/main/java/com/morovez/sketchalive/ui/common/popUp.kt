@@ -1,10 +1,10 @@
-package com.example.animatorforandroid.ui.common
+package com.morovez.sketchalive.ui.common
 
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupWindow
-import com.example.animatorforandroid.utils.dpToPx
+import com.morovez.sketchalive.utils.dpToPx
 
 fun createPopUpWindow(instruments: View): PopupWindow {
     val popUpWindow = PopupWindow(

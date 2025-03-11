@@ -17,7 +17,7 @@
  * WY    27Oct2015  Initial creation
  */
 
-package com.example.animatorforandroid.data;
+package com.morovez.sketchalive.data;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -733,7 +733,7 @@ public class AnimatedGIFWriter {
 			    else if (green < 0) green = 0;
 				
 				blue = (rgbTriplet[index1]&0x0000ff) + thisErrB[col + 1];
-				if (blue > 255) blue = 255;
+				if (blue >= 255) blue = 255;
 			    else if (blue < 0) blue = 0;
 
                 // Find the nearest color index

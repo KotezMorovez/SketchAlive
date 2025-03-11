@@ -1,4 +1,4 @@
-package com.example.animatorforandroid.utils
+package com.morovez.sketchalive.utils
 
 import android.content.Context
 import android.util.DisplayMetrics

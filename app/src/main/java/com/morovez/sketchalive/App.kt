@@ -1,4 +1,4 @@
-package com.example.animatorforandroid
+package com.morovez.sketchalive
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

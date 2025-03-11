@@ -1,4 +1,4 @@
-package com.example.animatorforandroid.ui
+package com.morovez.sketchalive.ui
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -16,14 +16,14 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.example.animatorforandroid.R
-import com.example.animatorforandroid.databinding.ActivityMainBinding
-import com.example.animatorforandroid.databinding.FragmentInstrumentsBinding
-import com.example.animatorforandroid.databinding.FragmentPaletteBinding
-import com.example.animatorforandroid.databinding.FragmentSliderForInstrumentBinding
-import com.example.animatorforandroid.ui.common.CanvasView
-import com.example.animatorforandroid.ui.common.createPopUpWindow
+import com.morovez.sketchalive.R
+import com.morovez.sketchalive.ui.common.CanvasView
+import com.morovez.sketchalive.ui.common.createPopUpWindow
 import com.google.android.material.slider.Slider
+import com.morovez.sketchalive.databinding.ActivityMainBinding
+import com.morovez.sketchalive.databinding.FragmentInstrumentsBinding
+import com.morovez.sketchalive.databinding.FragmentPaletteBinding
+import com.morovez.sketchalive.databinding.FragmentSliderForInstrumentBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                         gifLoader.isGone = true
                         val uriToGif = FileProvider.getUriForFile(
                             Objects.requireNonNull(applicationContext),
-                            "com.example.animatorforandroid.provider",
+                            "com.morovez.sketchalive.provider",
                             file
                         )
                         val shareIntent = Intent(Intent.ACTION_SEND)

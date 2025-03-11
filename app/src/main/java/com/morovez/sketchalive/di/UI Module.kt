@@ -1,7 +1,7 @@
-package com.example.animatorforandroid.di
+package com.morovez.sketchalive.di
 
-import com.example.animatorforandroid.ui.PaletteHandler
-import com.example.animatorforandroid.ui.PaletteHandlerImpl
+import com.morovez.sketchalive.ui.PaletteHandler
+import com.morovez.sketchalive.ui.PaletteHandlerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Reusable

@@ -1,4 +1,4 @@
-package com.example.animatorforandroid.ui.common
+package com.morovez.sketchalive.ui.common
 
 import android.content.Context
 import android.graphics.Bitmap

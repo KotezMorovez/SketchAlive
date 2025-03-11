@@ -1,4 +1,4 @@
-package com.example.animatorforandroid.ui.common
+package com.morovez.sketchalive.ui.common
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
-import com.example.animatorforandroid.R
-import com.example.animatorforandroid.databinding.ViewCustomLoaderBinding
-import com.example.animatorforandroid.utils.dpToPx
+import com.morovez.sketchalive.R
+import com.morovez.sketchalive.databinding.ViewCustomLoaderBinding
+import com.morovez.sketchalive.utils.dpToPx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay

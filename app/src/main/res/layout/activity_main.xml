@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/dark_gray"
-    tools:context=".ui.MainActivity">
+    tools:context="com.morovez.sketchalive.ui.MainActivity">
 
     <ImageView
         android:id="@+id/back"
@@ -131,7 +131,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.animatorforandroid.ui.common.CanvasView
+    <com.morovez.sketchalive.ui.common.CanvasView
         android:id="@+id/canvasView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -340,7 +340,7 @@
             android:textColor="@color/white"
             android:text="Подготовка GIF"/>
 
-        <com.example.animatorforandroid.ui.common.CustomLoaderView
+        <com.morovez.sketchalive.ui.common.CustomLoaderView
             android:id="@+id/loaderView"
             android:layout_width="match_parent"
             android:layout_height="56dp"

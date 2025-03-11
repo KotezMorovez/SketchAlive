@@ -1,11 +1,11 @@
-package com.example.animatorforandroid.ui
+package com.morovez.sketchalive.ui
 
 import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.example.animatorforandroid.databinding.FragmentPaletteBinding
-import com.example.animatorforandroid.ui.PaletteHandlerImpl.Colors
-import com.example.animatorforandroid.ui.common.createPopUpWindow
+import com.morovez.sketchalive.databinding.FragmentPaletteBinding
+import com.morovez.sketchalive.ui.PaletteHandlerImpl.Colors
+import com.morovez.sketchalive.ui.common.createPopUpWindow
 import javax.inject.Inject
 
 interface PaletteHandler {

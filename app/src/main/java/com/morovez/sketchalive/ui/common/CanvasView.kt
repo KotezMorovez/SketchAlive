@@ -1,4 +1,4 @@
-package com.example.animatorforandroid.ui.common
+package com.morovez.sketchalive.ui.common
 
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.INFINITE
@@ -14,8 +14,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
-import com.example.animatorforandroid.data.AnimatedGIFWriter
-import com.example.animatorforandroid.R
+import com.morovez.sketchalive.data.AnimatedGIFWriter
+import com.morovez.sketchalive.R
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -23,6 +23,7 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import androidx.core.graphics.scale
 
 class CanvasView @JvmOverloads constructor(
     context: Context,
@@ -373,7 +374,7 @@ class CanvasView @JvmOverloads constructor(
     }
 
     private fun compressBitmap(bitmap: Bitmap, width: Int, height: Int): Bitmap {
-        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
+        val resizedBitmap = bitmap.scale(width, height)
         val outputStream = ByteArrayOutputStream()
         resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 25, outputStream)
         val byteArray = outputStream.toByteArray()
@@ -381,8 +382,8 @@ class CanvasView @JvmOverloads constructor(
     }
 
     private fun calculateArrowCoords(
-        length: Float,
-        headAngle: Double,
+        length: Float = 40.0F,
+        headAngle: Double = 45.0,
         x: Float,
         y: Float
     ): FloatArray {
@@ -467,7 +468,7 @@ class CanvasView @JvmOverloads constructor(
 
             if (eventIndex != eventList.size - 1) {
                 while (eventIndex != eventList.size - 1) {
-                    eventList.removeLast()
+                    eventList.removeAt(eventList.lastIndex)
                 }
             }
 
@@ -519,7 +520,7 @@ class CanvasView @JvmOverloads constructor(
 
                         if (eventIndex != eventList.size - 1) {
                             while (eventIndex != eventList.size - 1) {
-                                eventList.removeLast()
+                                eventList.removeAt(eventList.lastIndex)
                             }
                         }
 
@@ -646,7 +647,7 @@ class CanvasView @JvmOverloads constructor(
 
                         if (eventIndex != eventList.size - 1) {
                             while (eventIndex != eventList.size - 1) {
-                                eventList.removeLast()
+                                eventList.removeAt(eventList.lastIndex)
                             }
                         }
 
