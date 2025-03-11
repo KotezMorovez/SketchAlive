@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/dark_gray"
-    tools:context="com.morovez.sketchalive.ui.MainActivity">
+    tools:context=".ui.MainActivity">
 
     <ImageView
         android:id="@+id/back"
@@ -139,7 +139,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/canvas"
-        app:layout_constraintBottom_toTopOf="@+id/erase"
+        app:layout_constraintBottom_toTopOf="@+id/instruments"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/create"
@@ -226,6 +226,16 @@
         app:trackHeight="4dp"
         tools:visibility="visible" />
 
+    <include
+        android:id="@+id/instruments"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        layout="@layout/fragment_instruments"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
     <LinearLayout
         android:id="@+id/layersBottomPanel"
         android:layout_width="match_parent"
@@ -260,68 +270,6 @@
             android:src="@drawable/ic_done" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/pencil"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/ic_pencil"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/brush"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="invisible" />
-
-    <ImageView
-        android:id="@+id/brush"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/ic_brush"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/erase"
-        app:layout_constraintStart_toEndOf="@id/pencil"
-        tools:visibility="invisible" />
-
-    <ImageView
-        android:id="@+id/erase"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/ic_erase"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/instruments"
-        app:layout_constraintStart_toEndOf="@id/brush"
-        tools:visibility="invisible" />
-
-    <ImageView
-        android:id="@+id/instruments"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/ic_instruments"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/color"
-        app:layout_constraintStart_toEndOf="@id/erase"
-        tools:visibility="invisible" />
-
-    <ImageView
-        android:id="@+id/color"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/ic_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/instruments"
-        app:layout_constraintTop_toTopOf="@+id/instruments"
-        tools:src="@drawable/color_active"
-        tools:visibility="invisible" />
-
     <LinearLayout
         android:id="@+id/gifLoader"
         android:layout_width="match_parent"
@@ -330,7 +278,7 @@
         android:orientation="vertical"
         android:gravity="center"
         android:visibility="invisible"
-        tools:visibility="visible">
+        tools:visibility="gone">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

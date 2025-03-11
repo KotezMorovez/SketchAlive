@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 interface PaletteHandler {
     fun setPaletteBinding(paletteViewBinding: FragmentPaletteBinding)
-    fun setListener(lambda: (Colors) -> Unit)
+    fun setPaletteListener(lambda: (Colors) -> Unit)
     fun getColor(): Int
     fun showPalette()
 }
@@ -24,7 +24,7 @@ class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
         val popUpWindow = createPopUpWindow(paletteViewBinding.root)
 
         with(paletteViewBinding) {
-            paletteViewBinding.firstColor.setOnClickListener {
+            firstColor.setOnClickListener {
                 currentARGBColor = Color.argb(255, 255, 255, 255)
                 val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
                 colorChooseListener?.invoke(
@@ -36,7 +36,7 @@ class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
                 popUpWindow.dismiss()
             }
 
-            paletteViewBinding.secondColor.setOnClickListener {
+            secondColor.setOnClickListener {
                 currentARGBColor = Color.argb(255, 255, 61, 0)
                 val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
                 colorChooseListener?.invoke(
@@ -48,7 +48,7 @@ class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
                 popUpWindow.dismiss()
             }
 
-            paletteViewBinding.thirdColor.setOnClickListener {
+            thirdColor.setOnClickListener {
                 currentARGBColor = Color.argb(255, 0, 0, 0)
                 val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
                 colorChooseListener?.invoke(
@@ -60,7 +60,7 @@ class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
                 popUpWindow.dismiss()
             }
 
-            paletteViewBinding.fourthColor.setOnClickListener {
+            fourthColor.setOnClickListener {
                 currentARGBColor = Color.argb(255, 25, 118, 210)
                 val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
                 colorChooseListener?.invoke(
@@ -72,7 +72,7 @@ class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
                 popUpWindow.dismiss()
             }
 
-            paletteViewBinding.colorWheel.setColorChangeListener {
+            colorWheel.setColorChangeListener {
                 currentARGBColor = it ?: Color.argb(255, 0, 0, 0)
                 val hexColor = String.format("#%06X", 0xFFFFFF and currentARGBColor)
                 colorChooseListener?.invoke(
@@ -89,7 +89,7 @@ class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
         this.paletteViewBinding = paletteViewBinding
     }
 
-    override fun setListener(lambda: (Colors) -> Unit) {
+    override fun setPaletteListener(lambda: (Colors) -> Unit) {
         colorChooseListener = lambda
     }
 

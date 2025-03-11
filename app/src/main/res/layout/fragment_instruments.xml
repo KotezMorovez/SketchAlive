@@ -1,34 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_popup"
-    android:paddingVertical="16dp">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="@color/dark_gray">
+
     <ImageView
-        android:id="@+id/rectangle"
+        android:id="@+id/pencil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_pencil"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/brush"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/brush"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:src="@drawable/ic_rect"/>
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/ic_brush"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/erase"
+        app:layout_constraintStart_toEndOf="@id/pencil" />
 
     <ImageView
-        android:id="@+id/circle"
+        android:id="@+id/erase"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_circle"/>
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/ic_erase"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/instruments"
+        app:layout_constraintStart_toEndOf="@id/brush" />
 
     <ImageView
-        android:id="@+id/triangle"
+        android:id="@+id/instruments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_triangle"/>
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/ic_instruments"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/color"
+        app:layout_constraintStart_toEndOf="@id/erase" />
 
     <ImageView
-        android:id="@+id/arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_arrow"/>
-</LinearLayout>
+        android:id="@+id/color"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/ic_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/instruments"
+        app:layout_constraintTop_toTopOf="@+id/instruments" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
