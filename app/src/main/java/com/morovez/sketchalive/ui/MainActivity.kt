@@ -2,7 +2,6 @@ package com.morovez.sketchalive.ui
 
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.Outline
 import android.os.Bundle
 import android.view.View
@@ -16,14 +15,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.morovez.sketchalive.R
-import com.morovez.sketchalive.ui.common.CanvasView
-import com.morovez.sketchalive.ui.common.createPopUpWindow
 import com.google.android.material.slider.Slider
+import com.morovez.sketchalive.R
 import com.morovez.sketchalive.databinding.ActivityMainBinding
-import com.morovez.sketchalive.databinding.FragmentInstrumentsBinding
 import com.morovez.sketchalive.databinding.FragmentPaletteBinding
-import com.morovez.sketchalive.databinding.FragmentSliderForInstrumentBinding
+import com.morovez.sketchalive.ui.common.CanvasView
+import com.morovez.sketchalive.ui.common.InstrumentsPanelView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,29 +32,35 @@ import kotlin.math.roundToInt
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
+    private var layersPreview = listOf<Pair<CanvasView.FrameNode, Bitmap>>()
+    private var layersPreviewList: ArrayList<ImageView> = arrayListOf()
 
     @Inject
     lateinit var paletteHandler: PaletteHandler
-    private var currentButton = Buttons.NONE
-    private var layersPreview = listOf<Pair<CanvasView.FrameNode, Bitmap>>()
-    private var layersPreviewList: ArrayList<ImageView> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         val paletteBinding = FragmentPaletteBinding.inflate(layoutInflater)
-        paletteHandler.apply {
-            setPaletteBinding(paletteBinding)
-            setListener { colors: PaletteHandlerImpl.Colors ->
+
+
+        paletteHandler.let {
+            it.setPaletteBinding(paletteBinding)
+            it.setPaletteListener { colors: PaletteHandlerImpl.Colors ->
                 val colorStateList = colors.tint
                 val currentColor = colors.color
-                viewBinding.color.backgroundTintList = colorStateList
+                viewBinding.instruments.setColorTint(colorStateList)
                 viewBinding.canvasView.setColor(currentColor)
             }
-
         }
-        setContentView(viewBinding.root)
 
+        viewBinding.instruments.let {
+            it.setListeners(/*initInstrumentsListener(), initFiguresListener()*/ {}, {})
+        }
+
+
+
+        setContentView(viewBinding.root)
         initUI()
     }
 
@@ -154,119 +157,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
-            pencil.setOnClickListener {
-                canvasView.setInstrument(CanvasView.Instrument.PENCIL)
-                val currentColor = paletteHandler.getColor()
-                canvasView.setColor(currentColor)
-
-                setCurrentButton(Buttons.PENCIL)
-                showSlider()
-            }
-
-            brush.setOnClickListener {
-                canvasView.setInstrument(CanvasView.Instrument.BRUSH)
-                val currentColor = paletteHandler.getColor()
-                canvasView.setColor(currentColor)
-
-                setCurrentButton(Buttons.BRUSH)
-                showSlider()
-            }
-
-            erase.setOnClickListener {
-                canvasView.setInstrument(CanvasView.Instrument.ERASE)
-                canvasView.setColor(Color.TRANSPARENT)
-
-                setCurrentButton(Buttons.ERASE)
-                showSlider()
-            }
-
-            instruments.setOnClickListener {
-                showInstruments()
-                setCurrentButton(Buttons.INSTRUMENTS)
-                val currentColor = paletteHandler.getColor()
-                canvasView.setColor(currentColor)
-            }
-
-            color.setOnClickListener {
-                paletteHandler.showPalette()
-                setCurrentButton(Buttons.COLOR)
-            }
         }
-    }
-
-    private fun setCurrentButton(button: Buttons) {
-        if (currentButton == button) {
-            return
-        }
-
-        viewBinding.let {
-            when (currentButton) {
-                Buttons.PENCIL -> {
-                    it.pencil.setColorFilter(this.resources.getColor(R.color.button_inactive, null))
-                }
-
-                Buttons.BRUSH -> {
-                    it.brush.setColorFilter(this.resources.getColor(R.color.button_inactive, null))
-                }
-
-                Buttons.ERASE -> {
-                    it.erase.setColorFilter(this.resources.getColor(R.color.button_inactive, null))
-                }
-
-                Buttons.INSTRUMENTS -> {
-                    it.instruments.setColorFilter(
-                        this.resources.getColor(
-                            R.color.button_inactive,
-                            null
-                        )
-                    )
-                }
-
-                Buttons.COLOR -> {
-                    it.color.setImageDrawable(null)
-                }
-
-                else -> {}
-            }
-
-            when (button) {
-                Buttons.PENCIL -> {
-                    it.pencil.setColorFilter(this.resources.getColor(R.color.button_active, null))
-                }
-
-                Buttons.BRUSH -> {
-                    it.brush.setColorFilter(this.resources.getColor(R.color.button_active, null))
-                }
-
-                Buttons.ERASE -> {
-                    it.erase.setColorFilter(this.resources.getColor(R.color.button_active, null))
-                }
-
-                Buttons.INSTRUMENTS -> {
-                    it.instruments.setColorFilter(
-                        this.resources.getColor(
-                            R.color.button_active,
-                            null
-                        )
-                    )
-                }
-
-                Buttons.COLOR -> {
-                    it.color.setImageDrawable(
-                        ResourcesCompat.getDrawable(
-                            this.resources,
-                            R.drawable.color_active,
-                            null
-                        )
-                    )
-                }
-
-                else -> {}
-            }
-        }
-
-        currentButton = button
     }
 
     private fun showLayersList() {
@@ -358,56 +249,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showInstruments() {
-        val popUpInstrumentsBinding = FragmentInstrumentsBinding.inflate(layoutInflater)
-
-        val popUpWindow = createPopUpWindow(popUpInstrumentsBinding.root)
-
-        popUpInstrumentsBinding.rectangle.setOnClickListener {
-            viewBinding.canvasView.setInstrument(CanvasView.Instrument.RECTANGLE)
-            viewBinding.canvasView.setInstrumentWidth(16f)
-            popUpWindow.dismiss()
-        }
-        popUpInstrumentsBinding.circle.setOnClickListener {
-            viewBinding.canvasView.setInstrument(CanvasView.Instrument.CIRCLE)
-            viewBinding.canvasView.setInstrumentWidth(16f)
-            popUpWindow.dismiss()
-        }
-        popUpInstrumentsBinding.triangle.setOnClickListener {
-            viewBinding.canvasView.setInstrument(CanvasView.Instrument.TRIANGLE)
-            viewBinding.canvasView.setInstrumentWidth(16f)
-            popUpWindow.dismiss()
-        }
-        popUpInstrumentsBinding.arrow.setOnClickListener {
-            viewBinding.canvasView.setInstrument(CanvasView.Instrument.ARROW)
-            viewBinding.canvasView.setInstrumentWidth(16f)
-            popUpWindow.dismiss()
-        }
-    }
-
-    private fun showSlider() {
-        val popUpSliderBinding = FragmentSliderForInstrumentBinding.inflate(layoutInflater)
-
-        createPopUpWindow(popUpSliderBinding.root)
-
-        popUpSliderBinding.slider.value = viewBinding.canvasView.getCurrentInstrumentWidth()
-        popUpSliderBinding.slider.setLabelFormatter {
-            "${it.roundToInt()}"
-        }
-        popUpSliderBinding.slider.addOnSliderTouchListener(
-            object : Slider.OnSliderTouchListener {
-                override fun onStartTrackingTouch(slider: Slider) {
-                    // Реагирует, когда событие касания ползунка запускается
-                }
-
-                override fun onStopTrackingTouch(slider: Slider) {
-                    // Реагирует, когда событие касания ползунка останавливается
-                    viewBinding.canvasView.setInstrumentWidth(slider.value.roundToInt().toFloat())
-                }
-            }
-        )
-    }
-
     private fun invalidateLayersPreview() {
         with(viewBinding) {
             layer1.background = layersPreview[0].second.toDrawable(resources)
@@ -477,17 +318,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideAllPanels() {
         with(viewBinding) {
+            viewBinding.instruments.hidePanel()
+
             back.isInvisible = true
             forward.isInvisible = true
             delete.isInvisible = true
             create.isInvisible = true
             layers.isInvisible = true
-
-            pencil.isInvisible = true
-            brush.isInvisible = true
-            erase.isInvisible = true
-            instruments.isInvisible = true
-            color.isInvisible = true
 
             animationSlider.isInvisible = true
             share.isInvisible = true
@@ -505,17 +342,10 @@ class MainActivity : AppCompatActivity() {
             create.isClickable = false
 
             layers.isClickable = false
-            pencil.isClickable = false
-            brush.isClickable = false
-            erase.isClickable = false
-            instruments.isClickable = false
-            color.isClickable = false
-
             animationSlider.isClickable = false
             share.isClickable = false
             play.isClickable = false
             pause.isClickable = false
-
             layersTopPanel.isClickable = false
             layersBottomPanel.isClickable = false
         }
@@ -524,17 +354,12 @@ class MainActivity : AppCompatActivity() {
     private fun showDefaultPanels() {
         with(viewBinding) {
             hideAllPanels()
+            viewBinding.instruments.showPanel()
             back.isVisible = true
             forward.isVisible = true
             delete.isVisible = true
             create.isVisible = true
             layers.isVisible = true
-
-            pencil.isVisible = true
-            brush.isVisible = true
-            erase.isVisible = true
-            instruments.isVisible = true
-            color.isVisible = true
 
             play.isVisible = true
             pause.isVisible = true
@@ -544,23 +369,9 @@ class MainActivity : AppCompatActivity() {
             delete.isClickable = true
             create.isClickable = true
             layers.isClickable = true
-            pencil.isClickable = true
-            brush.isClickable = true
-            erase.isClickable = true
-            instruments.isClickable = true
-            color.isClickable = true
             animationSlider.isClickable = false
             play.isClickable = true
             pause.isClickable = true
         }
-    }
-
-    enum class Buttons {
-        NONE,
-        PENCIL,
-        BRUSH,
-        ERASE,
-        INSTRUMENTS,
-        COLOR
     }
 }
