@@ -18,9 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.slider.Slider
 import com.morovez.sketchalive.R
 import com.morovez.sketchalive.databinding.ActivityMainBinding
-import com.morovez.sketchalive.databinding.FragmentPaletteBinding
 import com.morovez.sketchalive.ui.common.CanvasView
-import com.morovez.sketchalive.ui.common.InstrumentsPanelView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,31 +32,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     private var layersPreview = listOf<Pair<CanvasView.FrameNode, Bitmap>>()
     private var layersPreviewList: ArrayList<ImageView> = arrayListOf()
-
-    @Inject
-    lateinit var paletteHandler: PaletteHandler
+    private var mediator: Mediator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
-        val paletteBinding = FragmentPaletteBinding.inflate(layoutInflater)
 
-
-        paletteHandler.let {
-            it.setPaletteBinding(paletteBinding)
-            it.setPaletteListener { colors: PaletteHandlerImpl.Colors ->
-                val colorStateList = colors.tint
-                val currentColor = colors.color
-                viewBinding.instruments.setColorTint(colorStateList)
-                viewBinding.canvasView.setColor(currentColor)
-            }
+        mediator = Mediator(
+            instrumentsPanel = viewBinding.instruments,
+            canvasView = viewBinding.canvasView,
+            palettePanel = PalettePanelView(this)
+        ).apply {
+            initialize()
         }
-
-        viewBinding.instruments.let {
-            it.setListeners(/*initInstrumentsListener(), initFiguresListener()*/ {}, {})
-        }
-
-
 
         setContentView(viewBinding.root)
         initUI()

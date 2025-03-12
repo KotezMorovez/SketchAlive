@@ -5,26 +5,20 @@ import com.morovez.sketchalive.ui.common.CanvasView
 import com.morovez.sketchalive.ui.common.Figure
 import com.morovez.sketchalive.ui.common.Instrument
 import com.morovez.sketchalive.ui.common.InstrumentsPanelView
-import javax.inject.Inject
 
-interface Mediator {
-    fun initMediator()
-}
+class Mediator(
+    private val instrumentsPanel: InstrumentsPanelView,
+    private val canvasView: CanvasView,
+    private val palettePanel: PalettePanelView
+) {
 
-class MediatorImpl @Inject constructor(
-    val instrumentsPanel: InstrumentsPanelView,
-    val palettePanel: PaletteHandler,
-    val canvasView: CanvasView
-) : Mediator {
-
-    override fun initMediator() {
+    fun initialize() {
         instrumentsPanel.setListeners(
             initInstrumentsListener(),
             initFiguresListener(),
-//            initSliderListener(),
-//            initPaletteListener(),
-//            initCanvasListener()
         )
+
+        initPaletteListener()
     }
 
     private fun initInstrumentsListener(): (Instrument) -> Unit {
@@ -42,7 +36,6 @@ class MediatorImpl @Inject constructor(
                     val currentColor = palettePanel.getColor()
                     canvasView.setColor(currentColor)
 //                    showSlider()
-
                 }
 
                 Instrument.ERASE -> {
@@ -54,6 +47,7 @@ class MediatorImpl @Inject constructor(
                 Instrument.INSTRUMENTS -> {
                     val currentColor = palettePanel.getColor()
                     canvasView.setColor(currentColor)
+//                    showSlider()
                 }
 
                 Instrument.COLOR -> {
@@ -69,7 +63,7 @@ class MediatorImpl @Inject constructor(
         return { figure ->
             when (figure) {
                 Figure.RECTANGLE -> {
-                    canvasView.setInstrument(CanvasView.Instrument.CIRCLE)
+                    canvasView.setInstrument(CanvasView.Instrument.RECTANGLE)
                     canvasView.setInstrumentWidth(DEFAULT_INSTRUMENT_WIDTH)
                 }
 
@@ -89,6 +83,16 @@ class MediatorImpl @Inject constructor(
                 }
             }
 
+        }
+    }
+
+    private fun initPaletteListener() {
+        palettePanel.setPaletteListener { colors: Colors ->
+            val colorStateList = colors.tint
+            val currentColor = colors.color
+
+            instrumentsPanel.setColorTint(colorStateList)
+            canvasView.setColor(currentColor)
         }
     }
 

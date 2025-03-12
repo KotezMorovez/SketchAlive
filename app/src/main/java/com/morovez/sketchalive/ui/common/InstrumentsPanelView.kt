@@ -30,6 +30,10 @@ class InstrumentsPanelView @JvmOverloads constructor(
     private var figureChooserListener: ((Figure) -> Unit)? = null
     private var currentButton: Instrument = Instrument.NONE
 
+    init {
+        addView(instrumentsViewBinding.root)
+    }
+
     fun setColorTint(color: ColorStateList) {
         instrumentsViewBinding.color.backgroundTintList = color
     }
@@ -106,7 +110,7 @@ class InstrumentsPanelView @JvmOverloads constructor(
     }
 
     private fun setCurrentButton(button: Instrument) {
-        if (currentButton == button) {
+        if (currentButton == button && button != Instrument.INSTRUMENTS) {
             return
         }
 

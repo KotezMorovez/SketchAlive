@@ -18,8 +18,11 @@ class CustomLoaderView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : ConstraintLayout(context, attrs) {
-    private val viewBinding =
-        ViewCustomLoaderBinding.inflate(LayoutInflater.from(context), this, false)
+    private val viewBinding = ViewCustomLoaderBinding.inflate(
+        LayoutInflater.from(context),
+        this,
+        false
+    )
     private var isLoaderRun = false
 
     init {

@@ -10,12 +10,12 @@ import android.graphics.SweepGradient
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
-import androidx.core.graphics.createBitmap
 
 class ColorWheelView @JvmOverloads constructor(
     context: Context,
@@ -98,7 +98,10 @@ class ColorWheelView @JvmOverloads constructor(
                     touchX =
                         (COLOR_WHEEL_RADIUS * cos(angle) + cX)
                     touchY = (COLOR_WHEEL_RADIUS * sin(angle) + cY)
-                    colorChangeListener?.invoke(currentColor)
+                    if (touchX < bitmap.width && touchY < bitmap.height) {
+                        currentColor = bitmap[touchX.toInt(), touchY.toInt()]
+                        colorChangeListener?.invoke(currentColor)
+                    }
                 }
             }
 

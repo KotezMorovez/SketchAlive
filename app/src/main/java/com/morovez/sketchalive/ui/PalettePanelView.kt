@@ -1,27 +1,34 @@
 package com.morovez.sketchalive.ui
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.widget.FrameLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
-import com.morovez.sketchalive.databinding.FragmentPaletteBinding
-import com.morovez.sketchalive.ui.PaletteHandlerImpl.Colors
+import com.morovez.sketchalive.databinding.ViewPaletteBinding
 import com.morovez.sketchalive.ui.common.createPopUpWindow
-import javax.inject.Inject
 
-interface PaletteHandler {
-    fun setPaletteBinding(paletteViewBinding: FragmentPaletteBinding)
-    fun setPaletteListener(lambda: (Colors) -> Unit)
-    fun getColor(): Int
-    fun showPalette()
-}
-
-class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
-    private lateinit var paletteViewBinding: FragmentPaletteBinding
+class PalettePanelView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : FrameLayout(context, attrs) {
+    private val paletteViewBinding = ViewPaletteBinding.inflate(
+        LayoutInflater.from(context),
+        this,
+        false
+    )
     private var currentARGBColor = Color.argb(255, 25, 118, 210)
     private var colorChooseListener: ((Colors) -> Unit)? = null
 
-    override fun showPalette() {
-        val popUpWindow = createPopUpWindow(paletteViewBinding.root)
+    init {
+        addView(paletteViewBinding.root)
+    }
+
+    fun showPalette() {
+        val popUpWindow = createPopUpWindow(this)
 
         with(paletteViewBinding) {
             firstColor.setOnClickListener {
@@ -85,20 +92,17 @@ class PaletteHandlerImpl @Inject constructor() : PaletteHandler {
         }
     }
 
-    override fun setPaletteBinding(paletteViewBinding: FragmentPaletteBinding) {
-        this.paletteViewBinding = paletteViewBinding
-    }
-
-    override fun setPaletteListener(lambda: (Colors) -> Unit) {
+    fun setPaletteListener(lambda: (Colors) -> Unit) {
         colorChooseListener = lambda
     }
 
-    override fun getColor(): Int {
+    fun getColor(): Int {
         return currentARGBColor
     }
 
-    data class Colors(
-        val color: Int,
-        val tint: ColorStateList
-    )
 }
+
+data class Colors(
+    val color: Int,
+    val tint: ColorStateList
+)

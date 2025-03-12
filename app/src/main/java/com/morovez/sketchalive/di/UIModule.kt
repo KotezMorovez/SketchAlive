@@ -1,11 +1,8 @@
 package com.morovez.sketchalive.di
 
 import android.content.Context
-import com.morovez.sketchalive.ui.PaletteHandler
-import com.morovez.sketchalive.ui.PaletteHandlerImpl
-import com.morovez.sketchalive.ui.common.ResourceProvider
+import com.morovez.sketchalive.ui.PalettePanelView
 import com.morovez.sketchalive.ui.common.ResourceProviderImpl
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -16,18 +13,13 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface UIModule {
-    @Reusable
-    @Binds
-    fun bindPaletteHandler(impl: PaletteHandlerImpl): PaletteHandler
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-class ProvideUIModule {
+class UIModule {
     @Singleton
     @Provides
-    fun provideResourceProvider(@ApplicationContext context: Context): ResourceProvider {
-        return ResourceProviderImpl(context)
-    }
+    fun provideResourceProvider(@ApplicationContext context: Context) =
+        ResourceProviderImpl(context)
+
+    @Provides
+    @Reusable
+    fun providePalettePanelView(@ApplicationContext context: Context) = PalettePanelView(context)
 }
