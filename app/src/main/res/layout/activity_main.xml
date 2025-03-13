@@ -131,7 +131,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.morovez.sketchalive.ui.common.CanvasView
+    <com.morovez.sketchalive.ui.views.CanvasView
         android:id="@+id/canvasView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -226,7 +226,7 @@
         app:trackHeight="4dp"
         tools:visibility="visible" />
 
-    <com.morovez.sketchalive.ui.common.InstrumentsPanelView
+    <com.morovez.sketchalive.ui.views.InstrumentsPanelView
         android:id="@+id/instruments"
         android:layout_width="match_parent"
         android:layout_height="64dp"
@@ -286,7 +286,7 @@
             android:textColor="@color/white"
             android:text="Подготовка GIF"/>
 
-        <com.morovez.sketchalive.ui.common.CustomLoaderView
+        <com.morovez.sketchalive.ui.views.CustomLoaderView
             android:id="@+id/loaderView"
             android:layout_width="match_parent"
             android:layout_height="56dp"

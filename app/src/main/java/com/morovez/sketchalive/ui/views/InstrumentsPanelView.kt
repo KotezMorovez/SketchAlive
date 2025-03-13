@@ -1,21 +1,22 @@
-package com.morovez.sketchalive.ui.common
+package com.morovez.sketchalive.ui.views
 
 import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.morovez.sketchalive.R
 import com.morovez.sketchalive.databinding.FragmentFiguresBinding
 import com.morovez.sketchalive.databinding.ViewPanelInstrumentsBinding
+import com.morovez.sketchalive.ui.common.createPopUpWindow
 
 class InstrumentsPanelView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
-) : ConstraintLayout(context, attrs) {
+) : FrameLayout(context, attrs) {
     private val instrumentsViewBinding = ViewPanelInstrumentsBinding.inflate(
         LayoutInflater.from(context),
         this,

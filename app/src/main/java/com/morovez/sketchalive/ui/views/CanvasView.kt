@@ -1,4 +1,4 @@
-package com.morovez.sketchalive.ui.common
+package com.morovez.sketchalive.ui.views
 
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.INFINITE

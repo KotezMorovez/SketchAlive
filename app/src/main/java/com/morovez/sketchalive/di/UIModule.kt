@@ -1,7 +1,7 @@
 package com.morovez.sketchalive.di
 
 import android.content.Context
-import com.morovez.sketchalive.ui.PalettePanelView
+import com.morovez.sketchalive.ui.views.PalettePanelView
 import com.morovez.sketchalive.ui.common.ResourceProviderImpl
 import dagger.Module
 import dagger.Provides

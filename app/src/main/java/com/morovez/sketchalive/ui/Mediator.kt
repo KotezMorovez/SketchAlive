@@ -1,15 +1,19 @@
 package com.morovez.sketchalive.ui
 
 import android.graphics.Color
-import com.morovez.sketchalive.ui.common.CanvasView
-import com.morovez.sketchalive.ui.common.Figure
-import com.morovez.sketchalive.ui.common.Instrument
-import com.morovez.sketchalive.ui.common.InstrumentsPanelView
+import com.morovez.sketchalive.ui.views.CanvasView
+import com.morovez.sketchalive.ui.views.Colors
+import com.morovez.sketchalive.ui.views.Figure
+import com.morovez.sketchalive.ui.views.Instrument
+import com.morovez.sketchalive.ui.views.InstrumentsPanelView
+import com.morovez.sketchalive.ui.views.PalettePanelView
+import com.morovez.sketchalive.ui.views.SliderView
 
 class Mediator(
     private val instrumentsPanel: InstrumentsPanelView,
     private val canvasView: CanvasView,
-    private val palettePanel: PalettePanelView
+    private val palettePanel: PalettePanelView,
+    private val sliderView: SliderView
 ) {
 
     fun initialize() {
@@ -19,6 +23,7 @@ class Mediator(
         )
 
         initPaletteListener()
+        initSliderListener()
     }
 
     private fun initInstrumentsListener(): (Instrument) -> Unit {
@@ -28,26 +33,25 @@ class Mediator(
                     canvasView.setInstrument(CanvasView.Instrument.PENCIL)
                     val currentColor = palettePanel.getColor()
                     canvasView.setColor(currentColor)
-//                    showSlider()
+                    sliderView.showSlider(canvasView.getCurrentInstrumentWidth())
                 }
 
                 Instrument.BRUSH -> {
                     canvasView.setInstrument(CanvasView.Instrument.BRUSH)
                     val currentColor = palettePanel.getColor()
                     canvasView.setColor(currentColor)
-//                    showSlider()
+                    sliderView.showSlider(canvasView.getCurrentInstrumentWidth())
                 }
 
                 Instrument.ERASE -> {
                     canvasView.setInstrument(CanvasView.Instrument.ERASE)
                     canvasView.setColor(Color.TRANSPARENT)
-//                    showSlider()
+                    sliderView.showSlider(canvasView.getCurrentInstrumentWidth())
                 }
 
                 Instrument.INSTRUMENTS -> {
                     val currentColor = palettePanel.getColor()
                     canvasView.setColor(currentColor)
-//                    showSlider()
                 }
 
                 Instrument.COLOR -> {
@@ -96,28 +100,11 @@ class Mediator(
         }
     }
 
-//    private fun showSlider() {
-//        val popUpSliderBinding = FragmentSliderForInstrumentBinding.inflate(layoutInflater)
-//
-//        createPopUpWindow(popUpSliderBinding.root)
-//
-//        popUpSliderBinding.slider.value = viewBinding.canvasView.getCurrentInstrumentWidth()
-//        popUpSliderBinding.slider.setLabelFormatter {
-//            "${it.roundToInt()}"
-//        }
-//        popUpSliderBinding.slider.addOnSliderTouchListener(
-//            object : Slider.OnSliderTouchListener {
-//                override fun onStartTrackingTouch(slider: Slider) {
-//                    // Реагирует, когда событие касания ползунка запускается
-//                }
-//
-//                override fun onStopTrackingTouch(slider: Slider) {
-//                    // Реагирует, когда событие касания ползунка останавливается
-//                    viewBinding.canvasView.setInstrumentWidth(slider.value.roundToInt().toFloat())
-//                }
-//            }
-//        )
-//    }
+    private fun initSliderListener() {
+        sliderView.setListener { value ->
+           canvasView.setInstrumentWidth(value)
+        }
+    }
 
     companion object {
         private const val DEFAULT_INSTRUMENT_WIDTH = 16F

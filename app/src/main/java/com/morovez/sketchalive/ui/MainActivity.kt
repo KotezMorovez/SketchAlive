@@ -18,13 +18,14 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.slider.Slider
 import com.morovez.sketchalive.R
 import com.morovez.sketchalive.databinding.ActivityMainBinding
-import com.morovez.sketchalive.ui.common.CanvasView
+import com.morovez.sketchalive.ui.views.CanvasView
+import com.morovez.sketchalive.ui.views.PalettePanelView
+import com.morovez.sketchalive.ui.views.SliderView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Objects
-import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -41,7 +42,8 @@ class MainActivity : AppCompatActivity() {
         mediator = Mediator(
             instrumentsPanel = viewBinding.instruments,
             canvasView = viewBinding.canvasView,
-            palettePanel = PalettePanelView(this)
+            palettePanel = PalettePanelView(this),
+            sliderView = SliderView(this)
         ).apply {
             initialize()
         }

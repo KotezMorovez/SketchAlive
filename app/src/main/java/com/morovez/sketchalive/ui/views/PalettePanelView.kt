@@ -1,4 +1,4 @@
-package com.morovez.sketchalive.ui
+package com.morovez.sketchalive.ui.views
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
 import com.morovez.sketchalive.databinding.ViewPaletteBinding
 import com.morovez.sketchalive.ui.common.createPopUpWindow
