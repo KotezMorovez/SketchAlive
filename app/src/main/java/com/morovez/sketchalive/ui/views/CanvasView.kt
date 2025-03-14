@@ -157,11 +157,17 @@ class CanvasView @JvmOverloads constructor(
 
     fun setAnimationSpeed(speed: Float) {
         frameDelay = when (speed.toInt()) {
-            1 -> { 300L }
+            1 -> {
+                300L
+            }
 
-            2 -> { 200L }
+            2 -> {
+                200L
+            }
 
-            else -> { 100L }
+            else -> {
+                100L
+            }
         }
 
         valueAnimator.duration = frameDelay * frameListSize
@@ -185,7 +191,7 @@ class CanvasView @JvmOverloads constructor(
             activeFrameNode.next?.prev = activeFrameNode.prev
             activeFrameNode = activeFrameNode.prev!!
             eventList.clear()
-            eventIndex = -1
+            eventIndex -= 1
         } else {
             rootFrameNode = rootFrameNode.next ?: FrameNode(
                 id = frameIndex,
@@ -193,6 +199,7 @@ class CanvasView @JvmOverloads constructor(
             )
             rootFrameNode.prev = null
             activeFrameNode = rootFrameNode
+            eventIndex = -1
         }
         invalidate()
     }
@@ -229,7 +236,7 @@ class CanvasView @JvmOverloads constructor(
     }
 
     fun redo() {
-        if (eventIndex < eventList.size - 1) {
+         if (eventIndex < eventList.size - 1) {
             eventIndex++
             val event = eventList[eventIndex]
             activeFrameNode.canvasObjectList[event.index].isDelete =
@@ -244,7 +251,7 @@ class CanvasView @JvmOverloads constructor(
 
         valueAnimator.duration = frameDelay * frameListSize
 
-        valueAnimator.setFloatValues(0.01f, frameListSize.toFloat()-0.01f)
+        valueAnimator.setFloatValues(0.01f, frameListSize.toFloat() - 0.01f)
 
         animationActiveFrame = rootFrameNode
         invalidate()
@@ -341,7 +348,7 @@ class CanvasView @JvmOverloads constructor(
 
         dir.mkdir()
         val writer = AnimatedGIFWriter(true)
-        val output= FileOutputStream(cacheUri)
+        val output = FileOutputStream(cacheUri)
         writer.prepareForWrite(output, -1, -1)
 
         do {

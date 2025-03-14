@@ -7,14 +7,14 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.graphics.toColorInt
-import com.morovez.sketchalive.databinding.ViewPaletteBinding
+import com.morovez.sketchalive.databinding.ViewPanelPaletteBinding
 import com.morovez.sketchalive.ui.common.createPopUpWindow
 
 class PalettePanelView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
-    private val paletteViewBinding = ViewPaletteBinding.inflate(
+    private val paletteViewBinding = ViewPanelPaletteBinding.inflate(
         LayoutInflater.from(context),
         this,
         false

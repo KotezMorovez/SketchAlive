@@ -9,7 +9,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.morovez.sketchalive.R
-import com.morovez.sketchalive.databinding.FragmentFiguresBinding
+import com.morovez.sketchalive.databinding.ViewPanelFiguresBinding
 import com.morovez.sketchalive.databinding.ViewPanelInstrumentsBinding
 import com.morovez.sketchalive.ui.common.createPopUpWindow
 
@@ -22,7 +22,7 @@ class InstrumentsPanelView @JvmOverloads constructor(
         this,
         false
     )
-    private val popUpInstrumentsBinding = FragmentFiguresBinding.inflate(
+    private val popUpInstrumentsBinding = ViewPanelFiguresBinding.inflate(
         LayoutInflater.from(context),
         this,
         false

@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.google.android.material.slider.Slider
-import com.morovez.sketchalive.databinding.FragmentSliderForInstrumentBinding
+import com.morovez.sketchalive.databinding.ViewSliderInstrumentBinding
 import com.morovez.sketchalive.ui.common.createPopUpWindow
 import kotlin.math.roundToInt
 
@@ -14,7 +14,7 @@ class SliderView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
     private var sliderListener: ((Float) -> Unit)? = null
-    private val popUpSliderBinding = FragmentSliderForInstrumentBinding.inflate(
+    private val popUpSliderBinding = ViewSliderInstrumentBinding.inflate(
         LayoutInflater.from(context),
         this,
         false

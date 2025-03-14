@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SketchAlive</string>
+    <string name="preparing_gif_loader">Подготовка GIF</string>
 </resources>
