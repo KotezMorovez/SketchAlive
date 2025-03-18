@@ -9,13 +9,12 @@
     tools:context=".ui.MainActivity">
 
     <com.morovez.sketchalive.ui.views.MainPanelView
-        android:id="@+id/main_panel"
+        android:id="@+id/mainPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-    />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.morovez.sketchalive.ui.views.CanvasView
         android:id="@+id/canvasView"
@@ -28,64 +27,17 @@
         app:layout_constraintBottom_toTopOf="@+id/instruments"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_panel"
+        app:layout_constraintTop_toBottomOf="@id/mainPanel"
         app:layout_constraintVertical_bias="1.0" />
 
-    <LinearLayout
+    <com.morovez.sketchalive.ui.views.LayersListTopPanelView
         android:id="@+id/layersTopPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:background="@drawable/bg_popup"
-        android:backgroundTint="@color/dark_gray"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingVertical="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/layers_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_arrow_layers_back" />
-
-        <ImageView
-            android:id="@+id/layer1"
-            android:layout_width="64dp"
-            android:layout_height="109dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/layer_preview_active"
-            tools:background="@drawable/ic_create" />
-
-        <ImageView
-            android:id="@+id/layer2"
-            android:layout_width="64dp"
-            android:layout_height="109dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/layer_preview_active"
-            tools:background="@drawable/ic_create" />
-
-        <ImageView
-            android:id="@+id/layer3"
-            android:layout_width="64dp"
-            android:layout_height="109dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/layer_preview_active"
-            tools:background="@drawable/ic_create" />
-
-        <ImageView
-            android:id="@+id/layers_forward"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_arrow_layers_forward" />
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/animationSlider"
@@ -120,39 +72,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <LinearLayout
+    <com.morovez.sketchalive.ui.views.LayersListBottomPanelView
         android:id="@+id/layersBottomPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="32dp"
-        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/duplicate"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_duplicate" />
-
-        <ImageView
-            android:id="@+id/deleteAll"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="40dp"
-            android:src="@drawable/ic_delete_all" />
-
-        <ImageView
-            android:id="@+id/done"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_done" />
-    </LinearLayout>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/gifLoader"

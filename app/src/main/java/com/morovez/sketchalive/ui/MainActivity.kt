@@ -9,6 +9,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import com.google.android.material.slider.Slider
 import com.morovez.sketchalive.databinding.ActivityMainBinding
+import com.morovez.sketchalive.ui.views.LayersListBottomPanelView
+import com.morovez.sketchalive.ui.views.LayersListTopPanelView
 import com.morovez.sketchalive.ui.views.PalettePanelView
 import com.morovez.sketchalive.ui.views.SliderView
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +30,9 @@ class MainActivity : AppCompatActivity() {
             instrumentsPanel = viewBinding.instruments,
             canvasView = viewBinding.canvasView,
             palettePanel = PalettePanelView(this),
-            sliderView = SliderView(this)
+            sliderView = SliderView(this),
+            layersListTopPanel = viewBinding.layersTopPanel,
+            layersListBottomPanel = viewBinding.layersBottomPanel
         ).apply {
             initialize()
         }
@@ -68,23 +72,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             )
-        }
-    }
-
-    private fun hideAllPanels() {
-        with(viewBinding) {
-            viewBinding.instruments.hidePanel()
-
-            animationSlider.isInvisible = true
-            gifLoader.isGone = true
-            loaderView.stopLoader()
-
-            layersTopPanel.isGone = true
-            layersBottomPanel.isGone = true
-
-            animationSlider.isClickable = false
-            layersTopPanel.isClickable = false
-            layersBottomPanel.isClickable = false
         }
     }
 }

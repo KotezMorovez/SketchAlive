@@ -1,11 +1,17 @@
 package com.morovez.sketchalive.ui
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import com.morovez.sketchalive.ui.views.CanvasView
 import com.morovez.sketchalive.ui.views.Colors
 import com.morovez.sketchalive.ui.views.Figure
 import com.morovez.sketchalive.ui.views.Instrument
 import com.morovez.sketchalive.ui.views.InstrumentsPanelView
+import com.morovez.sketchalive.ui.views.LayersList
+import com.morovez.sketchalive.ui.views.LayersListBottomPanelButtons
+import com.morovez.sketchalive.ui.views.LayersListBottomPanelView
+import com.morovez.sketchalive.ui.views.LayersListTopPanelButtons
+import com.morovez.sketchalive.ui.views.LayersListTopPanelView
 import com.morovez.sketchalive.ui.views.MainPanelButtons
 import com.morovez.sketchalive.ui.views.MainPanelView
 import com.morovez.sketchalive.ui.views.PalettePanelView
@@ -17,6 +23,8 @@ class Mediator(
     private val canvasView: CanvasView,
     private val palettePanel: PalettePanelView,
     private val sliderView: SliderView,
+    private val layersListTopPanel: LayersListTopPanelView,
+    private val layersListBottomPanel: LayersListBottomPanelView
 ) {
 
     fun initialize() {
@@ -24,6 +32,7 @@ class Mediator(
         initInstrumentsListener()
         initPaletteListener()
         initSliderListener()
+        initLayersListPanelsListener()
     }
 
     private fun initInstrumentsListener() {
@@ -125,7 +134,11 @@ class Mediator(
                 }
 
                 MainPanelButtons.LAYERS -> {
-//                    showLayersListPanels()
+                    hideAllPanels()
+                    showLayersListPanels(
+                        canvasView.getBitmapList(),
+                        canvasView.activeFrameNode
+                    )
                 }
 
                 MainPanelButtons.PAUSE -> {
@@ -170,15 +183,77 @@ class Mediator(
         }
     }
 
+    private fun hideAllPanels() {
+        instrumentsPanel.hidePanel()
+        mainPanel.hidePanel()
+        layersListTopPanel.hidePanel()
+        layersListBottomPanel.hidePanel()
+
+//        animationSlider.isInvisible = true
+//        gifLoader.isGone = true
+//        loaderView.stopLoader()
+//
+//        animationSlider.isClickable = false
+    }
+
+    private fun initLayersListPanelsListener() {
+        val topPanelListener: (LayersListTopPanelButtons) -> Unit = { button ->
+            when (button) {
+                LayersListTopPanelButtons.Back -> {
+                    canvasView.moveBack()
+                }
+
+                is LayersListTopPanelButtons.Layer -> {
+                    canvasView.showFrame(button.frameNode)
+                }
+
+                LayersListTopPanelButtons.Forward -> {
+                    canvasView.moveForward()
+                }
+            }
+
+            layersListTopPanel.updateListInfo(getLayersList())
+        }
+
+        layersListTopPanel.setListener(topPanelListener)
+
+        layersListBottomPanel.setListener { button ->
+            when (button) {
+                LayersListBottomPanelButtons.DONE -> {
+                    canvasView.closeLayersManager()
+                    showDefaultPanels()
+                }
+
+                LayersListBottomPanelButtons.DUPLICATE -> {
+                    canvasView.duplicateActiveFrame()
+                    layersListTopPanel.updateListInfo(getLayersList())
+                }
+
+                LayersListBottomPanelButtons.DELETE_ALL -> {
+                    canvasView.deleteAllFrames()
+                    layersListTopPanel.updateListInfo(getLayersList())
+                }
+            }
+        }
+    }
+
+    private fun getLayersList() = LayersList(
+        bitmapList = canvasView.getBitmapList(),
+        activeFrameNode = canvasView.activeFrameNode
+    )
+
+    private fun showLayersListPanels(
+        bitmapList: List<Pair<CanvasView.FrameNode, Bitmap>>,
+        activeFrameNode: CanvasView.FrameNode
+    ) {
+        layersListTopPanel.showLayersList(bitmapList, activeFrameNode)
+        layersListBottomPanel.showPanel()
+    }
+
     private fun showDefaultPanels() {
         hideAllPanels()
         instrumentsPanel.showPanel()
         mainPanel.showPanel()
-    }
-
-    private fun hideAllPanels() {
-        instrumentsPanel.hidePanel()
-        mainPanel.hidePanel()
     }
 
     companion object {

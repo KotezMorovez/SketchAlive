@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:background="@drawable/bg_popup"
+    android:backgroundTint="@color/dark_gray"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingVertical="16dp"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/layers_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_arrow_layers_back" />
+
+    <ImageView
+        android:id="@+id/layer1"
+        tools:background="@drawable/ic_create"
+        android:layout_width="64dp"
+        android:layout_height="109dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/layer_preview_active" />
+
+    <ImageView
+        android:id="@+id/layer2"
+        tools:background="@drawable/ic_create"
+        android:layout_width="64dp"
+        android:layout_height="109dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/layer_preview_active" />
+
+    <ImageView
+        android:id="@+id/layer3"
+        tools:background="@drawable/ic_create"
+        android:layout_width="64dp"
+        android:layout_height="109dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/layer_preview_active" />
+
+    <ImageView
+        android:id="@+id/layers_forward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_arrow_layers_forward" />
+</LinearLayout>
