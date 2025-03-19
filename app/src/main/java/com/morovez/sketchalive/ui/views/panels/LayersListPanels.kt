@@ -1,4 +1,4 @@
-package com.morovez.sketchalive.ui.views
+package com.morovez.sketchalive.ui.views.panels
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -13,13 +13,17 @@ import androidx.core.view.isVisible
 import com.morovez.sketchalive.R
 import com.morovez.sketchalive.databinding.ViewPanelLayersListBottomBinding
 import com.morovez.sketchalive.databinding.ViewPanelLayersListTopBinding
+import com.morovez.sketchalive.ui.views.CanvasView
 
 class LayersListTopPanelView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
     private var listener: ((LayersListTopPanelButtons) -> Unit)? = null
     private val viewBinding = ViewPanelLayersListTopBinding.inflate(
-        LayoutInflater.from(context), this, false
+        LayoutInflater.from(context),
+        this,
+        false
     )
     private var layersPreview = listOf<Pair<CanvasView.FrameNode, Bitmap>>()
     private var layersPreviewList: ArrayList<ImageView> = arrayListOf()
@@ -37,7 +41,6 @@ class LayersListTopPanelView @JvmOverloads constructor(
     fun hidePanel() {
         with(viewBinding.root) {
             isGone = true
-            isClickable = false
         }
     }
 
@@ -46,7 +49,7 @@ class LayersListTopPanelView @JvmOverloads constructor(
         activeFrameNode: CanvasView.FrameNode
     ) {
         with(viewBinding) {
-            viewBinding.root.isVisible = true
+            root.isVisible = true
 
             layersPreviewList = arrayListOf(layer1, layer2, layer3)
 
@@ -67,15 +70,13 @@ class LayersListTopPanelView @JvmOverloads constructor(
     }
 
     fun updateListInfo(info: LayersList) {
-        if (info.bitmapList != null && info.activeFrameNode != null) {
-            layersPreview = info.bitmapList
-            activeFrame = info.activeFrameNode
-            index = layersPreview.indexOfFirst {
-                it.first.id == activeFrame!!.id
-            }
-            setAllPreviewsInactive()
-            setFrame(layersPreviewList[index])
+        layersPreview = info.bitmapList
+        activeFrame = info.activeFrameNode
+        index = layersPreview.indexOfFirst {
+            it.first.id == activeFrame!!.id
         }
+        setAllPreviewsInactive()
+        setFrame(layersPreviewList[index])
 
         invalidateLayersPreview()
     }
@@ -141,8 +142,8 @@ sealed interface LayersListTopPanelButtons {
 }
 
 data class LayersList(
-    val bitmapList: List<Pair<CanvasView.FrameNode, Bitmap>>? = null,
-    val activeFrameNode: CanvasView.FrameNode? = null
+    val bitmapList: List<Pair<CanvasView.FrameNode, Bitmap>>,
+    val activeFrameNode: CanvasView.FrameNode
 )
 
 class LayersListBottomPanelView @JvmOverloads constructor(

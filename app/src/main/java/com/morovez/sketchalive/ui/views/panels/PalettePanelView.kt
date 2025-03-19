@@ -1,4 +1,4 @@
-package com.morovez.sketchalive.ui.views
+package com.morovez.sketchalive.ui.views.panels
 
 import android.content.Context
 import android.content.res.ColorStateList

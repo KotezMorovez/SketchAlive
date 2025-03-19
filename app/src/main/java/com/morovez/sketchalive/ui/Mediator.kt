@@ -1,38 +1,59 @@
 package com.morovez.sketchalive.ui
 
-import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Outline
+import android.view.View
+import android.view.ViewOutlineProvider
 import com.morovez.sketchalive.ui.views.CanvasView
-import com.morovez.sketchalive.ui.views.Colors
-import com.morovez.sketchalive.ui.views.Figure
-import com.morovez.sketchalive.ui.views.Instrument
-import com.morovez.sketchalive.ui.views.InstrumentsPanelView
-import com.morovez.sketchalive.ui.views.LayersList
-import com.morovez.sketchalive.ui.views.LayersListBottomPanelButtons
-import com.morovez.sketchalive.ui.views.LayersListBottomPanelView
-import com.morovez.sketchalive.ui.views.LayersListTopPanelButtons
-import com.morovez.sketchalive.ui.views.LayersListTopPanelView
-import com.morovez.sketchalive.ui.views.MainPanelButtons
-import com.morovez.sketchalive.ui.views.MainPanelView
-import com.morovez.sketchalive.ui.views.PalettePanelView
-import com.morovez.sketchalive.ui.views.SliderView
+import com.morovez.sketchalive.ui.views.panels.AnimationSliderView
+import com.morovez.sketchalive.ui.views.panels.Colors
+import com.morovez.sketchalive.ui.views.panels.Figure
+import com.morovez.sketchalive.ui.views.panels.Instrument
+import com.morovez.sketchalive.ui.views.panels.InstrumentSliderView
+import com.morovez.sketchalive.ui.views.panels.InstrumentsPanelView
+import com.morovez.sketchalive.ui.views.panels.LayersList
+import com.morovez.sketchalive.ui.views.panels.LayersListBottomPanelButtons
+import com.morovez.sketchalive.ui.views.panels.LayersListBottomPanelView
+import com.morovez.sketchalive.ui.views.panels.LayersListTopPanelButtons
+import com.morovez.sketchalive.ui.views.panels.LayersListTopPanelView
+import com.morovez.sketchalive.ui.views.panels.MainPanelButtons
+import com.morovez.sketchalive.ui.views.panels.MainPanelView
+import com.morovez.sketchalive.ui.views.panels.PalettePanelView
 
 class Mediator(
     private val mainPanel: MainPanelView,
     private val instrumentsPanel: InstrumentsPanelView,
     private val canvasView: CanvasView,
     private val palettePanel: PalettePanelView,
-    private val sliderView: SliderView,
+    private val instrumentSliderView: InstrumentSliderView,
     private val layersListTopPanel: LayersListTopPanelView,
-    private val layersListBottomPanel: LayersListBottomPanelView
+    private val layersListBottomPanel: LayersListBottomPanelView,
+    private val animationSlider: AnimationSliderView
 ) {
-
-    fun initialize() {
+    init {
+        initCanvasView()
         initMainPanelListener()
         initInstrumentsListener()
         initPaletteListener()
         initSliderListener()
         initLayersListPanelsListener()
+        initAnimationSliderListener()
+    }
+
+    private fun initCanvasView() {
+        canvasView.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View?, outline: Outline?) {
+                val corner = 56f
+                outline?.setRoundRect(
+                    0,
+                    0,
+                    view!!.width,
+                    view.height,
+                    corner
+                )
+            }
+        }
+        canvasView.clipToOutline = true
     }
 
     private fun initInstrumentsListener() {
@@ -43,20 +64,20 @@ class Mediator(
                         canvasView.setInstrument(CanvasView.Instrument.PENCIL)
                         val currentColor = palettePanel.getColor()
                         canvasView.setColor(currentColor)
-                        sliderView.showSlider(canvasView.getCurrentInstrumentWidth())
+                        instrumentSliderView.showSlider(canvasView.getCurrentInstrumentWidth())
                     }
 
                     Instrument.BRUSH -> {
                         canvasView.setInstrument(CanvasView.Instrument.BRUSH)
                         val currentColor = palettePanel.getColor()
                         canvasView.setColor(currentColor)
-                        sliderView.showSlider(canvasView.getCurrentInstrumentWidth())
+                        instrumentSliderView.showSlider(canvasView.getCurrentInstrumentWidth())
                     }
 
                     Instrument.ERASE -> {
                         canvasView.setInstrument(CanvasView.Instrument.ERASE)
                         canvasView.setColor(Color.TRANSPARENT)
-                        sliderView.showSlider(canvasView.getCurrentInstrumentWidth())
+                        instrumentSliderView.showSlider(canvasView.getCurrentInstrumentWidth())
                     }
 
                     Instrument.INSTRUMENTS -> {
@@ -109,7 +130,7 @@ class Mediator(
     }
 
     private fun initSliderListener() {
-        sliderView.setListener { value ->
+        instrumentSliderView.setListener { value ->
             canvasView.setInstrumentWidth(value)
         }
     }
@@ -135,10 +156,7 @@ class Mediator(
 
                 MainPanelButtons.LAYERS -> {
                     hideAllPanels()
-                    showLayersListPanels(
-                        canvasView.getBitmapList(),
-                        canvasView.activeFrameNode
-                    )
+                    showLayersListPanels(getLayersList())
                 }
 
                 MainPanelButtons.PAUSE -> {
@@ -148,7 +166,7 @@ class Mediator(
 
                 MainPanelButtons.PLAY -> {
                     hideAllPanels()
-                    // animationSlider.prepare()
+                    animationSlider.showAnimationSlider(canvasView.getCurrentAnimationSpeed())
                     canvasView.play()
                 }
 
@@ -181,19 +199,6 @@ class Mediator(
                 }
             }
         }
-    }
-
-    private fun hideAllPanels() {
-        instrumentsPanel.hidePanel()
-        mainPanel.hidePanel()
-        layersListTopPanel.hidePanel()
-        layersListBottomPanel.hidePanel()
-
-//        animationSlider.isInvisible = true
-//        gifLoader.isGone = true
-//        loaderView.stopLoader()
-//
-//        animationSlider.isClickable = false
     }
 
     private fun initLayersListPanelsListener() {
@@ -237,16 +242,26 @@ class Mediator(
         }
     }
 
-    private fun getLayersList() = LayersList(
-        bitmapList = canvasView.getBitmapList(),
-        activeFrameNode = canvasView.activeFrameNode
-    )
+    private fun initAnimationSliderListener() {
+        animationSlider.setListener { value ->
+            canvasView.setAnimationSpeed(value)
+        }
+    }
+
+    private fun hideAllPanels() {
+        instrumentsPanel.hidePanel()
+        mainPanel.hidePanel()
+        layersListTopPanel.hidePanel()
+        layersListBottomPanel.hidePanel()
+        animationSlider.hidePanel()
+//        gifLoader.isGone = true
+//        loaderView.stopLoader()
+    }
 
     private fun showLayersListPanels(
-        bitmapList: List<Pair<CanvasView.FrameNode, Bitmap>>,
-        activeFrameNode: CanvasView.FrameNode
+        layersList: LayersList
     ) {
-        layersListTopPanel.showLayersList(bitmapList, activeFrameNode)
+        layersListTopPanel.showLayersList(layersList.bitmapList, layersList.activeFrameNode)
         layersListBottomPanel.showPanel()
     }
 
@@ -255,6 +270,11 @@ class Mediator(
         instrumentsPanel.showPanel()
         mainPanel.showPanel()
     }
+
+    private fun getLayersList() = LayersList(
+        bitmapList = canvasView.getBitmapList(),
+        activeFrameNode = canvasView.activeFrameNode
+    )
 
     companion object {
         private const val DEFAULT_INSTRUMENT_WIDTH = 16F
