@@ -8,7 +8,7 @@
     android:background="@color/dark_gray"
     tools:context=".ui.MainActivity">
 
-    <com.morovez.sketchalive.ui.views.MainPanelView
+    <com.morovez.sketchalive.ui.views.panels.MainPanelView
         android:id="@+id/mainPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,41 +30,15 @@
         app:layout_constraintTop_toBottomOf="@id/mainPanel"
         app:layout_constraintVertical_bias="1.0" />
 
-    <com.morovez.sketchalive.ui.views.LayersListTopPanelView
+    <com.morovez.sketchalive.ui.views.panels.LayersListTopPanelView
         android:id="@+id/layersTopPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.slider.Slider
-        android:id="@+id/animationSlider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="24dp"
-        android:stepSize="1.0"
-        android:valueFrom="1.0"
-        android:valueTo="3.0"
-        android:visibility="invisible"
-        app:labelBehavior="withinBounds"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:thumbColor="@color/white"
-        app:thumbHeight="16dp"
-        app:thumbStrokeColor="@color/white"
-        app:trackColor="@color/green"
-        app:trackColorActive="@color/green"
-        app:trackColorInactive="@color/green"
-        app:trackHeight="4dp"
-        tools:visibility="visible" />
-
-    <com.morovez.sketchalive.ui.views.InstrumentsPanelView
+    <com.morovez.sketchalive.ui.views.panels.InstrumentsPanelView
         android:id="@+id/instruments"
         android:layout_width="match_parent"
         android:layout_height="64dp"
@@ -72,7 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.morovez.sketchalive.ui.views.LayersListBottomPanelView
+    <com.morovez.sketchalive.ui.views.panels.LayersListBottomPanelView
         android:id="@+id/layersBottomPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -80,6 +54,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <com.morovez.sketchalive.ui.views.panels.AnimationSliderView
+        android:id="@+id/animationSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/canvasView" />
     <LinearLayout
         android:id="@+id/gifLoader"
         android:layout_width="match_parent"

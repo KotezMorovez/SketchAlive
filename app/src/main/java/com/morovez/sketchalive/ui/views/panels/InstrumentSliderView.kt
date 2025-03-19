@@ -1,4 +1,4 @@
-package com.morovez.sketchalive.ui.views
+package com.morovez.sketchalive.ui.views.panels
 
 import android.content.Context
 import android.util.AttributeSet
@@ -9,7 +9,7 @@ import com.morovez.sketchalive.databinding.ViewSliderInstrumentBinding
 import com.morovez.sketchalive.ui.common.createPopUpWindow
 import kotlin.math.roundToInt
 
-class SliderView @JvmOverloads constructor(
+class InstrumentSliderView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
@@ -35,6 +35,7 @@ class SliderView @JvmOverloads constructor(
         popUpSliderBinding.slider.setLabelFormatter {
             "${it.roundToInt()}"
         }
+
         popUpSliderBinding.slider.addOnSliderTouchListener(
             object : Slider.OnSliderTouchListener {
                 override fun onStartTrackingTouch(slider: Slider) {
