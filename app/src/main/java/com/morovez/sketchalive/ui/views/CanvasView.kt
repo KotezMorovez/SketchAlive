@@ -14,16 +14,13 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
-import com.morovez.sketchalive.data.AnimatedGIFWriter
+import androidx.core.graphics.scale
 import com.morovez.sketchalive.R
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
-import androidx.core.graphics.scale
 
 class CanvasView @JvmOverloads constructor(
     context: Context,
@@ -33,10 +30,11 @@ class CanvasView @JvmOverloads constructor(
     private val eventList = ArrayList<Event>()
     private var frameIndex = 0L
     private var frameListSize = 1L
-    private var rootFrameNode = FrameNode(
+    var rootFrameNode = FrameNode(
         id = frameIndex,
         canvasObjectList = arrayListOf()
     )
+        private set
     var activeFrameNode = rootFrameNode
         private set
     private var animationActiveFrame = rootFrameNode
@@ -236,7 +234,7 @@ class CanvasView @JvmOverloads constructor(
     }
 
     fun redo() {
-         if (eventIndex < eventList.size - 1) {
+        if (eventIndex < eventList.size - 1) {
             eventIndex++
             val event = eventList[eventIndex]
             activeFrameNode.canvasObjectList[event.index].isDelete =
@@ -340,27 +338,6 @@ class CanvasView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun generateGif(): String {
-        var actualFrameNode: FrameNode? = rootFrameNode
-        val root = context.cacheDir.absolutePath + "/animator_gif_cache"
-        val cacheUri = "$root/animation.gif"
-        val dir = File(root)
-
-        dir.mkdir()
-        val writer = AnimatedGIFWriter(true)
-        val output = FileOutputStream(cacheUri)
-        writer.prepareForWrite(output, -1, -1)
-
-        do {
-            val bitmap = createBitmapFullSize(actualFrameNode!!)
-            writer.writeFrame(output, bitmap)
-            actualFrameNode = actualFrameNode.next
-        } while (actualFrameNode != null)
-
-        writer.finishWrite(output)
-        return cacheUri
-    }
-
     private fun clear() {
         activeFrameNode.canvasObjectList.clear()
         eventList.clear()
@@ -368,7 +345,7 @@ class CanvasView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun createBitmapFullSize(frameNode: FrameNode): Bitmap {
+    fun createBitmapFullSize(frameNode: FrameNode): Bitmap {
         val bitmap = backgroundBitmap.copy(Bitmap.Config.ARGB_8888, true)
         canvas.setBitmap(bitmap)
         drawFrame(frameNode.canvasObjectList, canvas, false)

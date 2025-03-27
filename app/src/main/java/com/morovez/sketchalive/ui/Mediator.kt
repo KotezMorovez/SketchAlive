@@ -8,6 +8,7 @@ import com.morovez.sketchalive.ui.views.CanvasView
 import com.morovez.sketchalive.ui.views.panels.AnimationSliderView
 import com.morovez.sketchalive.ui.views.panels.Colors
 import com.morovez.sketchalive.ui.views.panels.Figure
+import com.morovez.sketchalive.ui.views.panels.GifLoaderView
 import com.morovez.sketchalive.ui.views.panels.Instrument
 import com.morovez.sketchalive.ui.views.panels.InstrumentSliderView
 import com.morovez.sketchalive.ui.views.panels.InstrumentsPanelView
@@ -19,6 +20,7 @@ import com.morovez.sketchalive.ui.views.panels.LayersListTopPanelView
 import com.morovez.sketchalive.ui.views.panels.MainPanelButtons
 import com.morovez.sketchalive.ui.views.panels.MainPanelView
 import com.morovez.sketchalive.ui.views.panels.PalettePanelView
+import kotlinx.coroutines.GlobalScope
 
 class Mediator(
     private val mainPanel: MainPanelView,
@@ -28,7 +30,9 @@ class Mediator(
     private val instrumentSliderView: InstrumentSliderView,
     private val layersListTopPanel: LayersListTopPanelView,
     private val layersListBottomPanel: LayersListBottomPanelView,
-    private val animationSlider: AnimationSliderView
+    private val animationSlider: AnimationSliderView,
+    private val gifLoader: GifLoaderView,
+    private val listener: (CanvasView.FrameNode) -> Unit
 ) {
     init {
         initCanvasView()
@@ -38,6 +42,10 @@ class Mediator(
         initSliderListener()
         initLayersListPanelsListener()
         initAnimationSliderListener()
+    }
+
+    fun stopLoader() {
+        gifLoader.hide()
     }
 
     private fun initCanvasView() {
@@ -171,31 +179,8 @@ class Mediator(
                 }
 
                 MainPanelButtons.SHARE -> {
-//                    gifLoader.isVisible = true
-//                    lifecycleScope.launch(Dispatchers.Main) {
-//                        loaderView.startLoader()
-//                    }
-//
-//                    lifecycleScope.launch(Dispatchers.IO) {
-//                        val file = File(canvasView.generateGif())
-//                        loaderView.stopLoader()
-//
-//                        launch(Dispatchers.Main) {
-//                            gifLoader.isGone = true
-//                            val uriToGif = FileProvider.getUriForFile(
-//                                Objects.requireNonNull(applicationContext),
-//                                "com.morovez.sketchalive.provider",
-//                                file
-//                            )
-//                            val shareIntent = Intent(Intent.ACTION_SEND)
-//                            shareIntent.type = "image/gif"
-//                            shareIntent.putExtra(Intent.EXTRA_STREAM, uriToGif)
-//                            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//
-//                            val chooserIntent = Intent.createChooser(shareIntent, null)
-//                            this@MainActivity.startActivity(chooserIntent, null)
-//                        }
-//                    }
+                    gifLoader.show(GlobalScope)
+                    listener.invoke(canvasView.rootFrameNode)
                 }
             }
         }
@@ -254,8 +239,7 @@ class Mediator(
         layersListTopPanel.hidePanel()
         layersListBottomPanel.hidePanel()
         animationSlider.hidePanel()
-//        gifLoader.isGone = true
-//        loaderView.stopLoader()
+        gifLoader.hide()
     }
 
     private fun showLayersListPanels(

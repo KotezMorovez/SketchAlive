@@ -17,7 +17,7 @@
  * WY    27Oct2015  Initial creation
  */
 
-package com.morovez.sketchalive.data;
+package com.morovez.sketchalive.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;

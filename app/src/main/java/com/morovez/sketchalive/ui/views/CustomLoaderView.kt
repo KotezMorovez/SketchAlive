@@ -72,7 +72,7 @@ class CustomLoaderView @JvmOverloads constructor(
         view.requestLayout()
     }
 
-    suspend fun startLoader() {
+     suspend fun startLoader() {
         with(viewBinding) {
             val dotsArray: ArrayList<ImageView> = arrayListOf()
             dotsArray.add(progressDot1ImageView)
